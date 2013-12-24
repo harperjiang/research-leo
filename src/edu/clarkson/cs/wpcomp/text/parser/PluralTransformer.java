@@ -1,6 +1,9 @@
-package edu.clarkson.cs.wpcomp.text.processor;
+package edu.clarkson.cs.wpcomp.text.parser;
 
 import org.apache.commons.lang3.StringUtils;
+
+import edu.clarkson.cs.wpcomp.text.processor.Dicts;
+import edu.clarkson.cs.wpcomp.text.processor.WordDict;
 
 public class PluralTransformer implements Transformer {
 

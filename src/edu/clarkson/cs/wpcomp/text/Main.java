@@ -1,15 +1,13 @@
 package edu.clarkson.cs.wpcomp.text;
 
 import java.io.FileInputStream;
-import java.util.Map.Entry;
-import java.util.PriorityQueue;
+import java.util.List;
 
-import edu.clarkson.cs.wpcomp.text.processor.FrequencyProcessor;
-import edu.clarkson.cs.wpcomp.text.processor.FrequencyRecord;
-import edu.clarkson.cs.wpcomp.text.processor.WordDict;
-import edu.clarkson.cs.wpcomp.text.stream.DictionaryFilterTokenStream;
-import edu.clarkson.cs.wpcomp.text.stream.Parser;
-import edu.clarkson.cs.wpcomp.text.stream.ParserTokenStream;
+import edu.clarkson.cs.wpcomp.text.model.WordGroup;
+import edu.clarkson.cs.wpcomp.text.parser.DictionaryFilter;
+import edu.clarkson.cs.wpcomp.text.parser.Lexer;
+import edu.clarkson.cs.wpcomp.text.parser.Parser;
+import edu.clarkson.cs.wpcomp.text.processor.KeywordAnalysis;
 
 public class Main {
 
@@ -17,27 +15,16 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
+		FileInputStream fis = new FileInputStream("res/text/test2");
 
-		FileInputStream fis = new FileInputStream("res/text/test");
+		Parser parser = new Parser(new Lexer(fis));
+		parser.setFilter(new DictionaryFilter());
 
-		TokenStream ts = new DictionaryFilterTokenStream(new ParserTokenStream(
-				new Parser(fis)));
+		List<WordGroup> sentences = parser.parse();
 
-		FrequencyProcessor fprocessor = new FrequencyProcessor();
-		fprocessor.process(ts);
+		KeywordAnalysis analysis = new KeywordAnalysis();
+		analysis.analyze(sentences);
 
-		PriorityQueue<FrequencyRecord> sort = new PriorityQueue<FrequencyRecord>();
-		for (Entry<String, Integer> entry : fprocessor.getCounter().entrySet()) {
-			sort.offer(new FrequencyRecord(entry.getKey(), entry.getValue()));
-		}
-
-		while (!sort.isEmpty()) {
-			FrequencyRecord next = sort.poll();
-			System.out.print(next);
-			System.out.print(":");
-			System.out
-					.println(WordDict.getInstance().isWord(next.getWord()) ? "Word"
-							: "NonWord");
-		}
+		System.out.println(analysis.getKeywords());
 	}
 }

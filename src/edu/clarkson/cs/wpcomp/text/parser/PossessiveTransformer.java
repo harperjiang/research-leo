@@ -1,4 +1,6 @@
-package edu.clarkson.cs.wpcomp.text.processor;
+package edu.clarkson.cs.wpcomp.text.parser;
+
+import edu.clarkson.cs.wpcomp.text.processor.WordDict;
 
 public class PossessiveTransformer implements Transformer {
 

@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.text.processor;
+package edu.clarkson.cs.wpcomp.text.common;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

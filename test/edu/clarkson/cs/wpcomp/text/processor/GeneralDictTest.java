@@ -5,6 +5,8 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import edu.clarkson.cs.wpcomp.text.common.GeneralDict;
+
 public class GeneralDictTest {
 
 	@Test

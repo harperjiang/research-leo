@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.text.processor;
+package edu.clarkson.cs.wpcomp.text.parser;
 
 import java.util.ArrayList;
 import java.util.List;

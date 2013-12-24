@@ -1,11 +1,11 @@
-package edu.clarkson.cs.wpcomp.text.stream;
+package edu.clarkson.cs.wpcomp.text.parser;
 
 import org.apache.commons.lang3.StringUtils;
-import edu.clarkson.cs.wpcomp.text.Token;
+import edu.clarkson.cs.wpcomp.text.model.Token;
 
 %%
 
-%class Parser
+%class Lexer
 %public
 %type Token
 
@@ -31,10 +31,21 @@ public Token token() {
 	return StringUtils.isEmpty(data.trim())?null:new Token(data.trim());
 }
 
+public Token stopToken() {
+	Token token = token();
+	if(null!= token) {
+		token.setType(Token.Type.STOP);
+		return token;
+	} else {
+		return Token.STOP;
+	}
+}
+
 %}
 
 %%
+"."					{ return stopToken();}
+[,\":;”]+			{ return stopToken();}
+[\ \t\b\f\r\n]+ 	{ return token();	}
 
-[,\.\":;]+			{ return token();	}
-[\ \t\b\f\r\n]+ 	{ append(" ");		}
 .       			{ append(yytext()); }
