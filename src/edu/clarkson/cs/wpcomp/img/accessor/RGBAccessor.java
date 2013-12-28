@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc.accessor;
+package edu.clarkson.cs.wpcomp.img.accessor;
 
 public interface RGBAccessor {
 

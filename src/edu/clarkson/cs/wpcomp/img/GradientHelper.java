@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc.descriptor;
+package edu.clarkson.cs.wpcomp.img;
 
 import java.awt.Point;
 import java.awt.image.BandedSampleModel;
@@ -7,8 +7,8 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
-import edu.clarkson.cs.wpcomp.img.desc.accessor.ImageAccessor;
-import edu.clarkson.cs.wpcomp.img.desc.accessor.RGBAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
 
 public class GradientHelper {
 

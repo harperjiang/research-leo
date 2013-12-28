@@ -1,8 +1,9 @@
 package edu.clarkson.cs.wpcomp.img.desc.descriptor;
 
+import edu.clarkson.cs.wpcomp.img.GradientHelper;
+import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Histogram;
 import edu.clarkson.cs.wpcomp.img.desc.Vector;
-import edu.clarkson.cs.wpcomp.img.desc.accessor.RGBAccessor;
 
 public class HogDescriptor implements SVMDescriptor {
 

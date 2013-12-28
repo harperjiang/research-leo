@@ -4,7 +4,8 @@ import com.telmomenezes.jfastemd.Feature;
 import com.telmomenezes.jfastemd.Feature2D;
 import com.telmomenezes.jfastemd.Signature;
 
-import edu.clarkson.cs.wpcomp.img.desc.accessor.RGBAccessor;
+import edu.clarkson.cs.wpcomp.img.GradientHelper;
+import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
 
 public class GradientDescriptor implements EMDDescriptor {
 

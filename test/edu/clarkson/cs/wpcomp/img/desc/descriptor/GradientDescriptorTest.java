@@ -6,7 +6,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import edu.clarkson.cs.wpcomp.img.desc.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 
 public class GradientDescriptorTest extends GradientDescriptor {
 

@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import com.telmomenezes.jfastemd.JFastEMD;
 import com.telmomenezes.jfastemd.Signature;
 
-import edu.clarkson.cs.wpcomp.img.desc.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.GradientDescriptor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
