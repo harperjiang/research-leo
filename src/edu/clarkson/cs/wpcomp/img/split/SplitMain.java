@@ -37,60 +37,18 @@ public class SplitMain {
 		 * accessor.getHeight(); j++) { if (accessor.getValue(i,
 		 * j).equals(Color.BLACK)) { accessor.setValue(i, j, Color.RED); } } }
 		 */
-		System.out.println(System.currentTimeMillis());
 		Dimension[][] pp = preprocess(accessor);
-		System.out.println(System.currentTimeMillis());
+		Rectangle max = maxsplit(new Rectangle(0, 0, accessor.getWidth(),
+				accessor.getHeight()), pp, accessor);
+		// redrect(max, accessor);
+		Rectangle lower = lowerbound(max, pp, accessor);
+		redrect(lower, accessor);
+		// System.out.println(lower);
 
-		long area = 0;
-		Rectangle max = new Rectangle();
-
-		for (int i = 0; i < accessor.getWidth(); i++) {
-			for (int j = 0; j < accessor.getHeight(); j++) {
-				Dimension topLeft = pp[i][j];
-				long possible = topLeft.width * topLeft.height;
-				for (int w = topLeft.width; w > 0; w--) {
-					for (int h = topLeft.height; h > 0; h--) {
-						if (w * h < area) {
-							// fast break
-							w = 0;
-							h = 0;
-							continue;
-						}
-						Dimension topRight = pp[i + w][j];
-						Dimension bottomLeft = pp[i][j + h];
-						if (topRight.height >= topLeft.height
-								&& bottomLeft.width >= topLeft.width) {
-							// Rectangle
-							long curarea = w * h;
-							if (curarea > area) {
-								area = curarea;
-								max.x = i;
-								max.y = j;
-								max.width = w;
-								max.height = h;
-							}
-							if (curarea == possible) {
-								// Fast break
-								w = 0;
-								h = 0;
-							}
-						}
-					}
-				}
-
-			}
-		}
-		System.out.println(System.currentTimeMillis());
-		System.out.println(max);
-
-		for (int i = max.x; i < max.x + max.width; i++) {
-			accessor.setValue(i, max.y, Color.RED);
-			accessor.setValue(i, max.y + max.height, Color.RED);
-		}
-		for (int i = max.y; i < max.y + max.height; i++) {
-			accessor.setValue(max.x, i, Color.RED);
-			accessor.setValue(max.x + max.width, i, Color.RED);
-		}
+		Rectangle max2 = maxsplit(new Rectangle(lower.x + 1, lower.y + 1,
+				lower.width - 2, lower.height - 2), pp, accessor);
+		redrect(max2, accessor);
+		System.out.println(max2);
 
 		ImageIO.write(gradient, "png", new File("res/image/split/split.png"));
 	}
@@ -141,5 +99,91 @@ public class SplitMain {
 			}
 		}
 		return data;
+	}
+
+	protected static Rectangle maxsplit(Rectangle range, Dimension[][] pp,
+			ImageAccessor accessor) {
+		long area = 0;
+		Rectangle max = new Rectangle();
+		// TODO Add constraint of range to the calculation
+		for (int i = range.x; i < range.x + range.width; i++) {
+			for (int j = range.y; j < range.y + range.height; j++) {
+				Dimension topLeft = pp[i][j];
+				long possible = topLeft.width * topLeft.height;
+				for (int w = topLeft.width; w > 0; w--) {
+					for (int h = topLeft.height; h > 0; h--) {
+						if (w * h < area) {
+							// fast break
+							w = 0;
+							h = 0;
+							continue;
+						}
+						Dimension topRight = pp[i + w][j];
+						Dimension bottomLeft = pp[i][j + h];
+						if (topRight.height >= topLeft.height
+								&& bottomLeft.width >= topLeft.width) {
+							// Rectangle
+							long curarea = w * h;
+							if (curarea > area) {
+								area = curarea;
+								max.x = i;
+								max.y = j;
+								max.width = w;
+								max.height = h;
+							}
+							if (curarea == possible) {
+								// Fast break
+								w = 0;
+								h = 0;
+							}
+						}
+					}
+				}
+
+			}
+		}
+		return max;
+	}
+
+	protected static Rectangle lowerbound(Rectangle range, Dimension[][] pp,
+			ImageAccessor accessor) {
+		Rectangle lowerbound = new Rectangle(range);
+		int i = 0;
+		for (i = 0; i < range.width; i++) {
+			if (pp[range.x + i][range.y].height < pp[range.x][range.y].height)
+				break;
+		}
+		lowerbound.x += i - 1;
+		lowerbound.width -= i - 1;
+		for (i = range.width - 1; i > 0; i--) {
+			if (pp[range.x + i][range.y].height < pp[range.x][range.y].height)
+				break;
+		}
+		lowerbound.width -= range.width - 1 - i;
+		for (i = 0; i < range.height; i++) {
+			if (pp[range.x][range.y + i].width < pp[range.x][range.y].width)
+				break;
+		}
+		lowerbound.y += i - 1;
+		lowerbound.height -= i - 1;
+		for (i = 0; i < range.height; i++) {
+			if (pp[range.x][range.y + range.height - 1 - i].width < pp[range.x][range.y].width) {
+				break;
+			}
+		}
+		lowerbound.height -= i - 1;
+
+		return lowerbound;
+	}
+
+	protected static void redrect(Rectangle range, ImageAccessor accessor) {
+		for (int i = range.x; i < range.x + range.width; i++) {
+			accessor.setValue(i, range.y, Color.RED);
+			accessor.setValue(i, range.y + range.height, Color.RED);
+		}
+		for (int i = range.y; i < range.y + range.height; i++) {
+			accessor.setValue(range.x, i, Color.RED);
+			accessor.setValue(range.x + range.width, i, Color.RED);
+		}
 	}
 }
