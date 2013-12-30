@@ -1,20 +1,18 @@
 package edu.clarkson.cs.wpcomp.img.accessor;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 
-public class ImageAccessor implements RGBAccessor {
+public class ImageAccessor implements ColorAccessor {
 
 	private BufferedImage source;
 
 	private Raster data;
 
-	private int numBand;
-
 	public ImageAccessor(BufferedImage source) {
 		super();
 		this.source = source;
-		this.numBand = source.getSampleModel().getNumBands();
 	}
 
 	protected Raster getData() {
@@ -25,9 +23,14 @@ public class ImageAccessor implements RGBAccessor {
 	}
 
 	@Override
-	public int getValue(int x, int y, int channel) {
-		int[] pixel = getData().getPixel(x, y, new int[this.numBand]);
-		return pixel[channel];
+	public Color getValue(int x, int y) {
+		int rgb = source.getRGB(x, y);
+		return new Color(rgb);
+	}
+
+	@Override
+	public void setValue(int x, int y, Color value) {
+		source.setRGB(x, y, value.getRGB());
 	}
 
 	@Override
@@ -38,4 +41,5 @@ public class ImageAccessor implements RGBAccessor {
 	public int getHeight() {
 		return getData().getHeight();
 	}
+
 }

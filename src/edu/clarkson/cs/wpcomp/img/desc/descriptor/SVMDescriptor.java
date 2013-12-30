@@ -1,6 +1,6 @@
 package edu.clarkson.cs.wpcomp.img.desc.descriptor;
 
-import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Vector;
 
 /**
@@ -14,5 +14,5 @@ import edu.clarkson.cs.wpcomp.img.desc.Vector;
  */
 public interface SVMDescriptor {
 
-	public Vector describe(RGBAccessor input);
+	public Vector describe(ColorAccessor input);
 }

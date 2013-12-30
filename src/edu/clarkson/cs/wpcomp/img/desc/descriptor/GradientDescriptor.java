@@ -5,7 +5,7 @@ import com.telmomenezes.jfastemd.Feature2D;
 import com.telmomenezes.jfastemd.Signature;
 
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
-import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 
 public class GradientDescriptor implements EMDDescriptor {
 
@@ -25,7 +25,7 @@ public class GradientDescriptor implements EMDDescriptor {
 	}
 
 	@Override
-	public Signature describe(RGBAccessor accessor) {
+	public Signature describe(ColorAccessor accessor) {
 		int width = accessor.getWidth(), height = accessor.getHeight();
 
 		int cellWidth = (int) Math.ceil(((double) accessor.getWidth())

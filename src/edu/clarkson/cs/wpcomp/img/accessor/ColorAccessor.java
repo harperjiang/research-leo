@@ -1,6 +1,8 @@
 package edu.clarkson.cs.wpcomp.img.accessor;
 
-public interface RGBAccessor {
+import java.awt.Color;
+
+public interface ColorAccessor {
 
 	/**
 	 * 
@@ -10,7 +12,16 @@ public interface RGBAccessor {
 	 *            0:R, 1:G, 2:B
 	 * @return
 	 */
-	public int getValue(int x, int y, int channel);
+	public Color getValue(int x, int y);
+
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param channel
+	 * @param value
+	 */
+	public void setValue(int x, int y, Color color);
 
 	/**
 	 * 

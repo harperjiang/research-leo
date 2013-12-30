@@ -1,5 +1,6 @@
 package edu.clarkson.cs.wpcomp.img;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
@@ -7,8 +8,8 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
-import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
 
 public class GradientHelper {
 
@@ -16,7 +17,7 @@ public class GradientHelper {
 		WritableRaster oraster = Raster.createWritableRaster(
 				new BandedSampleModel(DataBuffer.TYPE_INT, input.getWidth(),
 						input.getHeight(), 3), new Point(0, 0));
-		RGBAccessor accessor = new ImageAccessor(input);
+		ColorAccessor accessor = new ImageAccessor(input);
 		for (int i = 0; i < input.getWidth(); i++) {
 			for (int j = 0; j < input.getHeight(); j++) {
 				int value = unifiedGradient(accessor, i, j);
@@ -29,7 +30,7 @@ public class GradientHelper {
 		return output;
 	}
 
-	public static int[] angledGradient(RGBAccessor input, int ix, int iy) {
+	public static int[] angledGradient(ColorAccessor input, int ix, int iy) {
 		int[] red = singleGradient(input, ix, iy, 0);
 		int[] green = singleGradient(input, ix, iy, 1);
 		int[] blue = singleGradient(input, ix, iy, 2);
@@ -43,22 +44,44 @@ public class GradientHelper {
 		return null;
 	}
 
-	public static int unifiedGradient(RGBAccessor input, int ix, int iy) {
+	public static int unifiedGradient(ColorAccessor input, int ix, int iy) {
 		int[] red = singleGradient(input, ix, iy, 0);
 		int[] green = singleGradient(input, ix, iy, 1);
 		int[] blue = singleGradient(input, ix, iy, 2);
 		return Math.max(red[0], Math.max(green[0], blue[0]));
 	}
 
-	public static int[] singleGradient(RGBAccessor input, int ix, int iy,
-			int channel) {
+	public static int[] singleGradient(ColorAccessor input, int ix, int iy,
+			int color) {
 		// int h0 = input.getValue(ix, iy, channel);
-		int hl = input.getValue(Math.max(0, ix - 1), iy, channel);
-		int hr = input.getValue(Math.min(input.getWidth() - 1, ix + 1), iy,
-				channel);
-		int ht = input.getValue(ix, Math.max(0, iy - 1), channel);
-		int hb = input.getValue(ix, Math.min(input.getHeight() - 1, iy + 1),
-				channel);
+		Color hlc = input.getValue(Math.max(0, ix - 1), iy);
+		Color hrc = input.getValue(Math.min(input.getWidth() - 1, ix + 1), iy);
+		Color htc = input.getValue(ix, Math.max(0, iy - 1));
+		Color hbc = input.getValue(ix, Math.min(input.getHeight() - 1, iy + 1));
+		int hl = 0, hr = 0, ht = 0, hb = 0;
+		switch (color) {
+		case 0:
+			hl = hlc.getRed();
+			hr = hrc.getRed();
+			ht = htc.getRed();
+			hb = hbc.getRed();
+			break;
+		case 1:
+			hl = hlc.getGreen();
+			hr = hrc.getGreen();
+			ht = htc.getGreen();
+			hb = hbc.getGreen();
+			break;
+		case 2:
+			hl = hlc.getBlue();
+			hr = hrc.getBlue();
+			ht = htc.getBlue();
+			hb = hbc.getBlue();
+			break;
+		default:
+			break;
+		}
+
 		// [-1, 0, 1]
 		int qv = hb - ht;
 		int qh = hr - hl;

@@ -1,7 +1,7 @@
 package edu.clarkson.cs.wpcomp.img.desc.descriptor;
 
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
-import edu.clarkson.cs.wpcomp.img.accessor.RGBAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Histogram;
 import edu.clarkson.cs.wpcomp.img.desc.Vector;
 
@@ -24,7 +24,7 @@ public class HogDescriptor implements SVMDescriptor {
 	}
 
 	@Override
-	public Vector describe(RGBAccessor img) {
+	public Vector describe(ColorAccessor img) {
 		int cellWidth = (int) Math.ceil((double) img.getWidth() / cellSize);
 		int cellHeight = (int) Math.ceil((double) img.getHeight() / cellSize);
 
