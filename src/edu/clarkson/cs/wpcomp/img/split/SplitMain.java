@@ -42,13 +42,21 @@ public class SplitMain {
 				accessor.getHeight()), pp, accessor);
 		// redrect(max, accessor);
 		Rectangle lower = lowerbound(max, pp, accessor);
-		redrect(lower, accessor);
+		// redrect(lower, accessor);
 		// System.out.println(lower);
 
 		Rectangle max2 = maxsplit(new Rectangle(lower.x + 1, lower.y + 1,
 				lower.width - 2, lower.height - 2), pp, accessor);
-		redrect(max2, accessor);
-		System.out.println(max2);
+		// redrect(max2, accessor);
+		// System.out.println(max2);
+		Rectangle lower2 = lowerbound(max2, pp, accessor);
+		redrect(lower2, accessor);
+		Rectangle max3 = maxsplit(new Rectangle(lower2.x + 2, lower2.y + 2,
+				lower2.width - 4, lower2.height - 4), pp, accessor);
+		redrect(max3, accessor);
+		System.out.println(lower2);
+		System.out.println(max3);
+		// Rectangle lower3 = lowerbound(max3, pp, accessor);
 
 		ImageIO.write(gradient, "png", new File("res/image/split/split.png"));
 	}
@@ -108,7 +116,11 @@ public class SplitMain {
 		// TODO Add constraint of range to the calculation
 		for (int i = range.x; i < range.x + range.width; i++) {
 			for (int j = range.y; j < range.y + range.height; j++) {
-				Dimension topLeft = pp[i][j];
+				Dimension topLeft = new Dimension(pp[i][j]);
+				topLeft.width = Math.min(topLeft.width, range.x + range.width
+						- i);
+				topLeft.height = Math.min(topLeft.height, range.y
+						+ range.height - j);
 				long possible = topLeft.width * topLeft.height;
 				for (int w = topLeft.width; w > 0; w--) {
 					for (int h = topLeft.height; h > 0; h--) {
