@@ -2,69 +2,13 @@ package edu.clarkson.cs.wpcomp.img.split;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 
-import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 
-public class ImageSplitter {
+public class RectangleSplitter extends AbstractSplitter {
 
-	private ImageAccessor accessor;
-
-	private Dimension[][] preprocess;
-
-	public ImageSplitter(BufferedImage source) {
-		accessor = new ImageAccessor(source);
-		preprocess();
-	}
-
-	public ImageAccessor getAccessor() {
-		return accessor;
-	}
-
-	protected void preprocess() {
-		preprocess = new Dimension[accessor.getWidth()][accessor.getHeight()];
-		// Vertical data
-		for (int i = 0; i < accessor.getWidth(); i++) {
-			int index = 0;
-			while (index < accessor.getHeight()) {
-				if (accessor.getValue(i, index).getRed() == 0) {
-					int start = index;
-					while (index < accessor.getHeight()
-							&& accessor.getValue(i, index).getRed() == 0) {
-						index++;
-					}
-					for (int j = index - 1; j >= start; j--) {
-						preprocess[i][j] = new Dimension(-1, index - 1 - j);
-					}
-				} else {
-					while (index < accessor.getHeight()
-							&& accessor.getValue(i, index).getRed() != 0) {
-						preprocess[i][index++] = new Dimension(-1, 0);
-					}
-				}
-			}
-		}
-		// Horizontal Data
-		for (int i = 0; i < accessor.getHeight(); i++) {
-			int index = 0;
-			while (index < accessor.getWidth()) {
-				if (accessor.getValue(index, i).getRed() == 0) {
-					int start = index;
-					while (index < accessor.getWidth()
-							&& accessor.getValue(index, i).getRed() == 0) {
-						index++;
-					}
-					for (int j = index - 1; j >= start; j--) {
-						preprocess[j][i].width = index - 1 - j;
-					}
-				} else {
-					while (index < accessor.getWidth()
-							&& accessor.getValue(index, i).getRed() != 0) {
-						preprocess[index++][i].width = 0;
-					}
-				}
-			}
-		}
+	public RectangleSplitter(ColorAccessor accessor) {
+		super(accessor);
 	}
 
 	public Rectangle maxsplit(Rectangle range) {
@@ -175,6 +119,10 @@ public class ImageSplitter {
 	}
 
 	protected Rectangle lowerbound(Rectangle range) {
+		if (null == range) {
+			range = new Rectangle(0, 0, accessor.getWidth(),
+					accessor.getHeight());
+		}
 		Rectangle lowerbound = new Rectangle(range);
 		Dimension bound = range.getSize();
 		Dimension expansion = preprocess[range.x][range.y];
