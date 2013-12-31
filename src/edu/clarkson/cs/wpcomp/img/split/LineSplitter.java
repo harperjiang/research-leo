@@ -17,8 +17,8 @@ public class LineSplitter extends AbstractSplitter {
 			range = new Rectangle(0, 0, accessor.getWidth(),
 					accessor.getHeight());
 		}
-		LineSegment vc = vcsplit(range);
-		LineSegment hc = hcsplit(range);
+		LineSegment vc = vccentralsplit(range);
+		LineSegment hc = hccentralsplit(range);
 		if (vc == null || hc == null) {
 			return vc == null ? hc : vc;
 		}
@@ -29,7 +29,7 @@ public class LineSplitter extends AbstractSplitter {
 		return vratio > hratio ? hc : vc;
 	}
 
-	protected LineSegment vcsplit(Rectangle range) {
+	protected LineSegment vccentralsplit(Rectangle range) {
 		long max = range.width;
 		int record = -1;
 		for (int i = range.x + 1; i < range.x + range.width - 1; i++) {
@@ -46,11 +46,22 @@ public class LineSplitter extends AbstractSplitter {
 		}
 		if (record == -1)
 			return null;
+		// Adjust to the center of black area
+		int left = record;
+		while (preprocess[left][range.y].height >= range.height) {
+			left--;
+		}
+		int right = record;
+		while (preprocess[right][range.y].height >= range.height) {
+			right++;
+		}
+		record = (left + right) / 2;
+
 		return new LineSegment(new Point(record, range.y), new Point(record,
 				range.y + range.height));
 	}
 
-	protected LineSegment hcsplit(Rectangle range) {
+	protected LineSegment hccentralsplit(Rectangle range) {
 		long max = range.height;
 		int record = -1;
 		for (int i = range.y + 1; i < range.y + range.height - 1; i++) {
@@ -69,7 +80,117 @@ public class LineSplitter extends AbstractSplitter {
 		if (-1 == record) {
 			return null;
 		}
+		// Adjust to the center of black area
+		int top = record;
+		while (preprocess[range.x][top].width >= range.width) {
+			top--;
+		}
+		int bottom = record;
+		while (preprocess[range.x][bottom].width >= range.width) {
+			bottom++;
+		}
+		record = (top + bottom) / 2;
 		return new LineSegment(new Point(range.x, record), new Point(range.x
 				+ range.width, record));
+	}
+
+	protected LineSegment split(Rectangle range, SplitCondition condition) {
+		if (null == range) {
+			range = new Rectangle(0, 0, accessor.getWidth(),
+					accessor.getHeight());
+		}
+		condition.setRange(range);
+		LineSegment vs = vsplit(range, condition);
+		LineSegment hs = hsplit(range, condition);
+		if (vs == null || hs == null) {
+			return vs == null ? hs : vs;
+		}
+		condition.setHorizontal(false);
+		int vratio = condition.bias(vs.from.x);
+		condition.setHorizontal(true);
+		int hratio = condition.bias(hs.from.y);
+		return vratio > hratio ? hs : vs;
+	}
+
+	protected LineSegment vsplit(Rectangle range, SplitCondition condition) {
+		condition.setHorizontal(false);
+		int bias = Integer.MAX_VALUE;
+		int record = -1;
+		for (int i = range.x + 1; i < range.x + range.width - 1; i++) {
+			if (condition.fastbreak(i))
+				break;
+			if (condition.satisfy(i)) {
+				// Candidate
+				int thisbias = condition.bias(i);
+				if (thisbias < bias) {
+					bias = thisbias;
+					record = i;
+				}
+			}
+		}
+		if (record == -1)
+			return null;
+		record = condition.postprocess(record);
+		return new LineSegment(new Point(record, range.y), new Point(record,
+				range.y + range.height));
+	}
+
+	protected LineSegment hsplit(Rectangle range, SplitCondition condition) {
+		condition.setHorizontal(true);
+		int bias = Integer.MAX_VALUE;
+		int record = -1;
+		for (int i = range.y + 1; i < range.y + range.height - 1; i++) {
+			if (condition.fastbreak(i)) {
+				break;
+			}
+			if (condition.satisfy(i)) {
+				// Candidate
+				int thisbias = condition.bias(i);
+				if (thisbias < bias) {
+					bias = thisbias;
+					record = i;
+				}
+			}
+		}
+		if (-1 == record) {
+			return null;
+		}
+		record = condition.postprocess(record);
+		return new LineSegment(new Point(range.x, record), new Point(range.x
+				+ range.width, record));
+	}
+
+	protected abstract class SplitCondition {
+
+		private Rectangle range;
+
+		protected boolean horizontal;
+
+		public SplitCondition() {
+		}
+
+		public boolean isHorizontal() {
+			return horizontal;
+		}
+
+		public void setHorizontal(boolean horizontal) {
+			this.horizontal = horizontal;
+		}
+
+		public Rectangle getRange() {
+			return range;
+		}
+
+		public void setRange(Rectangle range) {
+			this.range = range;
+		}
+
+		public abstract boolean satisfy(int point);
+
+		public abstract int bias(int point);
+
+		public abstract boolean fastbreak(int point);
+
+		public abstract int postprocess(int point);
 	}
 }
