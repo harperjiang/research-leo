@@ -94,6 +94,40 @@ public class LineSplitter extends AbstractSplitter {
 				+ range.width, record));
 	}
 
+	public LineSegment centralsplit2(Rectangle range) {
+		return split(range, new SplitCondition() {
+
+			@Override
+			public boolean satisfy(int point) {
+				if (isHorizontal()) {
+					return preprocess[range.x][point].width >= range.width;
+				} else {
+					return preprocess[point][range.y].height >= range.height;
+				}
+			}
+
+			@Override
+			public int bias(int point) {
+				if (isHorizontal()) {
+					return Math.abs(point - (range.y + range.height / 2));
+				} else {
+					return Math.abs(point - (range.x + range.width / 2));
+				}
+			}
+
+			@Override
+			public boolean fastbreak(int point) {
+				return false;
+			}
+
+			@Override
+			public int postprocess(int point) {
+				return point;
+			}
+
+		});
+	}
+
 	protected LineSegment split(Rectangle range, SplitCondition condition) {
 		if (null == range) {
 			range = new Rectangle(0, 0, accessor.getWidth(),
@@ -162,7 +196,7 @@ public class LineSplitter extends AbstractSplitter {
 
 	protected abstract class SplitCondition {
 
-		private Rectangle range;
+		protected Rectangle range;
 
 		protected boolean horizontal;
 
