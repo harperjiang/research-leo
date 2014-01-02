@@ -1,6 +1,5 @@
 package edu.clarkson.cs.wpcomp.img.split;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -13,88 +12,6 @@ public class LineSplitter extends AbstractSplitter {
 	}
 
 	public LineSegment centralsplit(Rectangle range) {
-		if (null == range) {
-			range = new Rectangle(0, 0, accessor.getWidth(),
-					accessor.getHeight());
-		}
-		LineSegment vc = vccentralsplit(range);
-		LineSegment hc = hccentralsplit(range);
-		if (vc == null || hc == null) {
-			return vc == null ? hc : vc;
-		}
-		int vratio = Math.abs((vc.from.x - (range.x + range.width / 2))
-				* range.height);
-		int hratio = Math.abs((vc.from.y - (range.y + range.height / 2))
-				* range.width);
-		return vratio > hratio ? hc : vc;
-	}
-
-	protected LineSegment vccentralsplit(Rectangle range) {
-		long max = range.width;
-		int record = -1;
-		for (int i = range.x + 1; i < range.x + range.width - 1; i++) {
-			if (i - (range.x + range.width / 2) > max)
-				break;
-			Dimension current = preprocess[i][range.y];
-			if (current.height >= range.height) {
-				// Candidate
-				if (Math.abs(i - (range.x + range.width / 2)) < max) {
-					max = Math.abs(i - (range.x + range.width / 2));
-					record = i;
-				}
-			}
-		}
-		if (record == -1)
-			return null;
-		// Adjust to the center of black area
-		int left = record;
-		while (preprocess[left][range.y].height >= range.height) {
-			left--;
-		}
-		int right = record;
-		while (preprocess[right][range.y].height >= range.height) {
-			right++;
-		}
-		record = (left + right) / 2;
-
-		return new LineSegment(new Point(record, range.y), new Point(record,
-				range.y + range.height));
-	}
-
-	protected LineSegment hccentralsplit(Rectangle range) {
-		long max = range.height;
-		int record = -1;
-		for (int i = range.y + 1; i < range.y + range.height - 1; i++) {
-			if (i - (range.y + range.height / 2) > max) {
-				break;
-			}
-			Dimension current = preprocess[range.x][i];
-			if (current.width >= range.width) {
-				// Candidate
-				if (Math.abs(i - (range.y + range.height / 2)) < max) {
-					max = Math.abs(i - (range.y + range.height / 2));
-					record = i;
-				}
-			}
-		}
-		if (-1 == record) {
-			return null;
-		}
-		// Adjust to the center of black area
-		int top = record;
-		while (preprocess[range.x][top].width >= range.width) {
-			top--;
-		}
-		int bottom = record;
-		while (preprocess[range.x][bottom].width >= range.width) {
-			bottom++;
-		}
-		record = (top + bottom) / 2;
-		return new LineSegment(new Point(range.x, record), new Point(range.x
-				+ range.width, record));
-	}
-
-	public LineSegment centralsplit2(Rectangle range) {
 		return split(range, new SplitCondition() {
 
 			@Override
@@ -116,15 +33,97 @@ public class LineSplitter extends AbstractSplitter {
 			}
 
 			@Override
-			public boolean fastbreak(int point) {
-				return false;
+			public int fastbreak(int point, int maxbias) {
+				if (isHorizontal()) {
+					return (point - (range.y + range.height / 2)) > maxbias ? (range.y
+							+ range.height - 1)
+							: point;
+				} else {
+					return (point - (range.x + range.width / 2)) > maxbias ? (range.x
+							+ range.width - 1)
+							: point;
+				}
 			}
 
 			@Override
 			public int postprocess(int point) {
-				return point;
+				if (isHorizontal()) {
+					int top, bottom;
+					for (top = point; top > 0
+							&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
+						;
+					for (bottom = point; bottom < range.y + range.height - 1
+							&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
+						;
+					return (top + bottom) / 2;
+				} else {
+					int left, right;
+					for (left = point; left > 0
+							&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
+						;
+					for (right = point; right < range.x + range.width - 1
+							&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
+						;
+					return (left + right) / 2;
+				}
 			}
 
+		});
+	}
+
+	public LineSegment maxmarginsplit(Rectangle range) {
+		return split(range, new SplitCondition() {
+
+			@Override
+			public boolean satisfy(int point) {
+				if (isHorizontal()) {
+					return preprocess[range.x][point].width >= range.width;
+				} else {
+					return preprocess[point][range.y].height >= range.height;
+				}
+			}
+
+			protected int[] margin(int point) {
+				if (isHorizontal()) {
+					int top, bottom;
+					for (top = point; top > range.y
+							&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
+						;
+					for (bottom = point; bottom < range.y + range.height - 1
+							&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
+						;
+					return new int[] { top, bottom };
+				} else {
+					int left, right;
+					for (left = point; left > range.x
+							&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
+						;
+					for (right = point; right < range.x + range.width - 1
+							&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
+						;
+					return new int[] { left, right };
+				}
+			}
+
+			@Override
+			public int bias(int point) {
+				int[] margin = margin(point);
+				return -(margin[1] - margin[0] - 2);
+			}
+
+			@Override
+			public int fastbreak(int point, int maxbias) {
+				if (!satisfy(point))
+					return point;
+				int[] margin = margin(point);
+				return margin[1] - 1;
+			}
+
+			@Override
+			public int postprocess(int point) {
+				int[] margin = margin(point);
+				return (margin[0] + margin[1]) / 2;
+			}
 		});
 	}
 
@@ -151,8 +150,10 @@ public class LineSplitter extends AbstractSplitter {
 		int bias = Integer.MAX_VALUE;
 		int record = -1;
 		for (int i = range.x + 1; i < range.x + range.width - 1; i++) {
-			if (condition.fastbreak(i))
-				break;
+			int fb = condition.fastbreak(i, bias);
+			if (fb != i) {
+				i = fb;
+			}
 			if (condition.satisfy(i)) {
 				// Candidate
 				int thisbias = condition.bias(i);
@@ -174,8 +175,9 @@ public class LineSplitter extends AbstractSplitter {
 		int bias = Integer.MAX_VALUE;
 		int record = -1;
 		for (int i = range.y + 1; i < range.y + range.height - 1; i++) {
-			if (condition.fastbreak(i)) {
-				break;
+			int fb = condition.fastbreak(i, bias);
+			if (fb != i) {
+				i = fb;
 			}
 			if (condition.satisfy(i)) {
 				// Candidate
@@ -223,7 +225,7 @@ public class LineSplitter extends AbstractSplitter {
 
 		public abstract int bias(int point);
 
-		public abstract boolean fastbreak(int point);
+		public abstract int fastbreak(int point, int maxbias);
 
 		public abstract int postprocess(int point);
 	}

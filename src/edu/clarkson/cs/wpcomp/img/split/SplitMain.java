@@ -32,7 +32,7 @@ public class SplitMain {
 		source.add(new Rectangle(0, 0, accessor.getWidth(), accessor
 				.getHeight()));
 
-		int depth = 4;
+		int depth = 5;
 
 		for (int i = 0; i < depth; i++) {
 			for (Rectangle r : source) {
