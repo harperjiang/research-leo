@@ -14,7 +14,7 @@ import edu.clarkson.cs.wpcomp.img.desc.descriptor.GradientDescriptor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
-public class ImageDescription {
+public class ImageDescMain {
 
 	/**
 	 * @param args

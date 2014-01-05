@@ -7,7 +7,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 
-public class ImageTransformation {
+public class ImageTransformMain {
 
 	public static void main(String[] args) throws Exception {
 		// Read image

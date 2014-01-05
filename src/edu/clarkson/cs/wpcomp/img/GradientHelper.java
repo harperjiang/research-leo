@@ -1,12 +1,7 @@
 package edu.clarkson.cs.wpcomp.img;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -14,19 +9,15 @@ import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 public class GradientHelper {
 
 	public static BufferedImage gradientImage(BufferedImage input) {
-		WritableRaster oraster = Raster.createWritableRaster(
-				new BandedSampleModel(DataBuffer.TYPE_INT, input.getWidth(),
-						input.getHeight(), 3), new Point(0, 0));
+		BufferedImage output = new BufferedImage(input.getWidth(),
+				input.getHeight(), BufferedImage.TYPE_INT_RGB);
 		ColorAccessor accessor = new ImageAccessor(input);
 		for (int i = 0; i < input.getWidth(); i++) {
 			for (int j = 0; j < input.getHeight(); j++) {
 				int value = unifiedGradient(accessor, i, j);
-				oraster.setPixel(i, j, new int[] { value, value, value });
+				output.setRGB(i, j, new Color(value, value, value).getRGB());
 			}
 		}
-		BufferedImage output = new BufferedImage(input.getWidth(),
-				input.getHeight(), BufferedImage.TYPE_INT_RGB);
-		output.setData(oraster);
 		return output;
 	}
 
