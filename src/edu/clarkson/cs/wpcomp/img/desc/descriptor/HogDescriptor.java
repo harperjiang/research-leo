@@ -3,7 +3,8 @@ package edu.clarkson.cs.wpcomp.img.desc.descriptor;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Histogram;
-import edu.clarkson.cs.wpcomp.img.desc.Vector;
+import edu.clarkson.cs.wpcomp.img.desc.Feature;
+import edu.clarkson.cs.wpcomp.img.desc.SVMDescriptor;
 
 public class HogDescriptor implements SVMDescriptor {
 
@@ -24,7 +25,7 @@ public class HogDescriptor implements SVMDescriptor {
 	}
 
 	@Override
-	public Vector describe(ColorAccessor img) {
+	public Feature describe(ColorAccessor img) {
 		int cellWidth = (int) Math.ceil((double) img.getWidth() / cellSize);
 		int cellHeight = (int) Math.ceil((double) img.getHeight() / cellSize);
 
@@ -56,12 +57,12 @@ public class HogDescriptor implements SVMDescriptor {
 			}
 		}
 
-		Vector data = new Vector();
+		Feature data = new Feature();
 		// Normalization
 		for (int i = 0; i < 9; i++) {
 			dataarray[i] = NormalizationHelper.normalize(dataarray[i],
 					cellWidth, cellHeight, normalizeSize);
-			data.join(new Vector(dataarray[i]));
+			data.join(new Feature(dataarray[i]));
 		}
 		return data;
 	}

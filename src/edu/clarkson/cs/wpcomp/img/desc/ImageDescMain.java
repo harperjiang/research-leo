@@ -29,7 +29,7 @@ public class ImageDescMain {
 
 		System.out.println(System.currentTimeMillis());
 		HogDescriptor descriptor = new HogDescriptor();
-		Vector result = descriptor.describe(accessor);
+		Feature result = descriptor.describe(accessor);
 		System.out.println(result.size());
 		System.out.println(System.currentTimeMillis());
 	}

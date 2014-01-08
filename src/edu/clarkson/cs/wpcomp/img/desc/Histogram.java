@@ -8,7 +8,7 @@ public class Histogram {
 
 	private Map<Object, Integer> values;
 
-	private Vector buffer;
+	private Feature buffer;
 
 	public Histogram() {
 		super();
@@ -33,7 +33,7 @@ public class Histogram {
 		return values.get(key);
 	}
 
-	public Vector getData() {
+	public Feature getData() {
 		if (null != buffer)
 			return buffer;
 		double[] result = new double[values.size()];
@@ -44,7 +44,7 @@ public class Histogram {
 			Object key = order.poll();
 			result[counter++] = values.get(key);
 		}
-		buffer = new Vector(result);
+		buffer = new Feature(result);
 		return buffer;
 	}
 }

@@ -6,6 +6,7 @@ import com.telmomenezes.jfastemd.Signature;
 
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
+import edu.clarkson.cs.wpcomp.img.desc.EMDDescriptor;
 
 public class GradientDescriptor implements EMDDescriptor {
 

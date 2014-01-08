@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc.descriptor;
+package edu.clarkson.cs.wpcomp.img.desc;
 
 import com.telmomenezes.jfastemd.Signature;
 

@@ -3,21 +3,21 @@ package edu.clarkson.cs.wpcomp.img.desc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Vector {
+public class Feature {
 
 	private List<Double> data;
 
-	public Vector() {
+	public Feature() {
 		this.data = new ArrayList<Double>();
 	}
 
-	public Vector(double[] array) {
+	public Feature(double[] array) {
 		this();
 		for (int i = 0; i < array.length; i++)
 			this.data.add(array[i]);
 	}
 
-	public Vector(List<Double> d) {
+	public Feature(List<Double> d) {
 		this();
 		this.data.addAll(d);
 	}
@@ -43,11 +43,11 @@ public class Vector {
 		}
 	}
 
-	public Vector subVector(int from, int to) {
-		return new Vector(data.subList(from, to));
+	public Feature subVector(int from, int to) {
+		return new Feature(data.subList(from, to));
 	}
 
-	public void join(Vector another) {
+	public void join(Feature another) {
 		this.data.addAll(another.data);
 	}
 
