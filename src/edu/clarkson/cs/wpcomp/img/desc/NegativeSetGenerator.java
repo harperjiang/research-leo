@@ -1,6 +1,7 @@
 package edu.clarkson.cs.wpcomp.img.desc;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,54 +9,100 @@ import java.text.MessageFormat;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import javax.imageio.ImageIO;
+
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 
 public class NegativeSetGenerator {
 
+	public static final int STATE_INIT = 1;
+
+	public static final int STATE_LOAD_DONE = 2;
+
+	public static final int STATE_PROCESS_DONE = 3;
+
 	public static void main(String[] args) throws Exception {
-		final BlockingQueue<BufferedImage> imageQueue = new LinkedBlockingQueue<BufferedImage>(
+		BlockingQueue<BufferedImage> imageQueue = new LinkedBlockingQueue<BufferedImage>(
 				100);
-		final BlockingQueue<Feature> featureQueue = new LinkedBlockingQueue<Feature>(
+		BlockingQueue<Feature> featureQueue = new LinkedBlockingQueue<Feature>(
 				1000);
-		final HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
+		HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
+		AtomicInteger state = new AtomicInteger(1);
 
-		int cpuCount = 4;
+		InputThread inputThread = new InputThread(imageQueue, state);
+		inputThread.start();
 
-		for (int i = 0; i < cpuCount; i++) {
-			Thread thread = new Thread() {
-				public void run() {
-					BufferedImage image = imageQueue.poll();
-					Feature feature = hog.describe(new ImageAccessor(image));
-					featureQueue.offer(feature);
-				}
-			};
-			thread.start();
-		}
-
-		OutputThread outputThread = new OutputThread(featureQueue);
+		OutputThread outputThread = new OutputThread(featureQueue, state);
 		outputThread.start();
 
+	}
+
+	protected static class InputThread extends Thread {
+		private Queue<BufferedImage> imageQueue;
+
+		private AtomicInteger state;
+
+		public InputThread(Queue<BufferedImage> imageQueue, AtomicInteger state) {
+			super();
+			this.imageQueue = imageQueue;
+			this.state = state;
+		}
+
+		public void run() {
+			File dir = new File("res/image/negative");
+			for (File file : dir.listFiles()) {
+				try {
+					imageQueue.offer(ImageIO.read(file));
+				} catch (IOException e) {
+					System.out.println(e);
+				}
+			}
+			state.set(STATE_LOAD_DONE);
+		}
+	}
+
+	protected static class ProcessThread extends Thread {
+		private Queue<BufferedImage> imageQueue;
+
+		private Queue<Feature> featureQueue;
+
+		private AtomicInteger state;
+
+		public ProcessThread(Queue<BufferedImage> imageQueue,
+				Queue<Feature> featureQueue, AtomicInteger state) {
+			super();
+			this.imageQueue = imageQueue;
+			this.featureQueue = featureQueue;
+			this.state = state;
+		}
+
+		@Override
+		public void run() {
+			while (!imageQueue.isEmpty() || state.get() != STATE_LOAD_DONE) {
+				if (imageQueue.isEmpty()) {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					continue;
+				}
+			}
+		}
 	}
 
 	protected static class OutputThread extends Thread {
 
 		private Queue<Feature> featureQueue;
 
-		private boolean inputDone;
+		private AtomicInteger state;
 
-		public OutputThread(Queue<Feature> featureQueue) {
+		public OutputThread(Queue<Feature> featureQueue, AtomicInteger state) {
 			super();
 			this.featureQueue = featureQueue;
-		}
-
-		public boolean isInputDone() {
-			return inputDone;
-		}
-
-		public void setInputDone(boolean inputDone) {
-			this.inputDone = inputDone;
+			this.state = state;
 		}
 
 		public void run() {
