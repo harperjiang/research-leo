@@ -6,14 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -23,55 +18,74 @@ import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 
 public class NegativeSetGenerator {
 
-	public static final int STATE_INIT = 1;
-
-	public static final int STATE_LOAD_DONE = 2;
-
-	public static final int STATE_PROCESS_DONE = 3;
-
 	public static void main(String[] args) throws Exception {
+		BlockingQueue<BufferedImage> imageQueue = new LinkedBlockingQueue<BufferedImage>(
+				100);
 		BlockingQueue<Feature> featureQueue = new LinkedBlockingQueue<Feature>(
 				1000);
 		SVMDescriptor hog = new HogSVMDescriptor(50, 1);
 		Semaphore outputLock = new Semaphore(0);
-		int cpuCount = 4;
-		ExecutorService threadPool = Executors.newFixedThreadPool(cpuCount);
 
+		int cpuCount = 4;
 		OutputThread outputThread = new OutputThread(featureQueue, outputLock);
 		outputThread.start();
+
+		ProcessThread[] threadPool = new ProcessThread[cpuCount];
+		for (int i = 0; i < cpuCount; i++) {
+			threadPool[i] = new ProcessThread(imageQueue, featureQueue, hog);
+			threadPool[i].start();
+		}
 
 		int counter = 0;
 		File dir = new File("res/image/negative");
 		for (File file : dir.listFiles()) {
 			try {
-				threadPool.submit(new ProcessImage(ImageIO.read(file),
-						featureQueue, hog));
+				imageQueue.put(ImageIO.read(file));
 				counter++;
-			} catch (IOException e) {
-				System.out.println(e);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		outputLock.acquire(counter);
-		threadPool.shutdown();
+		for (int i = 0; i < cpuCount; i++) {
+			threadPool[i].setExit(true);
+		}
 	}
 
-	protected static class ProcessImage implements Runnable {
-		private BufferedImage image;
-		private Queue<Feature> featureQueue;
-
+	protected static class ProcessThread extends Thread {
+		private BlockingQueue<BufferedImage> imageQueue;
+		private BlockingQueue<Feature> featureQueue;
 		private SVMDescriptor desc;
+		private boolean exit = false;
 
-		public ProcessImage(BufferedImage image, Queue<Feature> featureQueue,
-				SVMDescriptor desc) {
+		public ProcessThread(BlockingQueue<BufferedImage> imageQueue,
+				BlockingQueue<Feature> featureQueue, SVMDescriptor desc) {
 			super();
-			this.image = image;
+			setDaemon(true);
+			this.imageQueue = imageQueue;
 			this.featureQueue = featureQueue;
 			this.desc = desc;
 		}
 
+		public void setExit(boolean t) {
+			this.exit = t;
+		}
+
 		@Override
 		public void run() {
-			featureQueue.add(desc.describe(new ImageAccessor(image)));
+			while (!exit) {
+				try {
+					BufferedImage image = imageQueue.poll(1, TimeUnit.SECONDS);
+					if (image == null) {
+						continue;
+					} else {
+						featureQueue.put(desc
+								.describe(new ImageAccessor(image)));
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
