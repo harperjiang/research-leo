@@ -10,8 +10,8 @@ import com.telmomenezes.jfastemd.JFastEMD;
 import com.telmomenezes.jfastemd.Signature;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
-import edu.clarkson.cs.wpcomp.img.desc.descriptor.GradientDescriptor;
-import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogDescriptor;
+import edu.clarkson.cs.wpcomp.img.desc.descriptor.GradientEMDDescriptor;
+import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
 public class ImageDescMain {
@@ -28,7 +28,7 @@ public class ImageDescMain {
 		ImageAccessor accessor = new ImageAccessor(img);
 
 		System.out.println(System.currentTimeMillis());
-		HogDescriptor descriptor = new HogDescriptor();
+		HogSVMDescriptor descriptor = new HogSVMDescriptor();
 		Feature result = descriptor.describe(accessor);
 		System.out.println(result.size());
 		System.out.println(System.currentTimeMillis());
@@ -58,7 +58,7 @@ public class ImageDescMain {
 		// ImageIO.write(GradientHelper.gradientImage(google), "png", new File(
 		// "res/output/google.png"));
 
-		GradientDescriptor gradesc = new GradientDescriptor(10, 5);
+		GradientEMDDescriptor gradesc = new GradientEMDDescriptor(10, 5);
 
 		System.out.println(System.currentTimeMillis());
 		Signature ebay1sig = gradesc.describe(new ImageAccessor(ebay1));
@@ -68,16 +68,16 @@ public class ImageDescMain {
 		Signature ebay3sig = gradesc.describe(new ImageAccessor(ebay3));
 		Signature googlesig = gradesc.describe(new ImageAccessor(google));
 		System.out.println(System.currentTimeMillis());
-		
+
 		System.out.println(JFastEMD.distance(ebay1sig, ebay1_trans_sig, 1));
 		System.out.println(System.currentTimeMillis());
-		
+
 		System.out.println(JFastEMD.distance(ebay1sig, ebay2sig, 1));
 		System.out.println(System.currentTimeMillis());
-		
+
 		System.out.println(JFastEMD.distance(ebay1sig, ebay3sig, 1));
 		System.out.println(System.currentTimeMillis());
-		
+
 		System.out.println(JFastEMD.distance(ebay1sig, googlesig, 1));
 		System.out.println(System.currentTimeMillis());
 	}

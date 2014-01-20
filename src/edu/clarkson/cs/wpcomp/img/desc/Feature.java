@@ -54,4 +54,12 @@ public class Feature {
 	public int size() {
 		return data.size();
 	}
+
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (double val : data) {
+			builder.append(String.format("%.4f", val)).append(" ");
+		}
+		return builder.toString().trim();
+	}
 }

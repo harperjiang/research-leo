@@ -6,7 +6,7 @@ import edu.clarkson.cs.wpcomp.img.desc.Histogram;
 import edu.clarkson.cs.wpcomp.img.desc.Feature;
 import edu.clarkson.cs.wpcomp.img.desc.SVMDescriptor;
 
-public class HogDescriptor implements SVMDescriptor {
+public class HogSVMDescriptor implements SVMDescriptor {
 
 	// Cells are nxn pixels
 	private int cellSize;
@@ -14,11 +14,11 @@ public class HogDescriptor implements SVMDescriptor {
 	// Rectangular block. Blocks are (2n+1)(2n+1) cells.
 	private int normalizeSize;
 
-	public HogDescriptor() {
+	public HogSVMDescriptor() {
 		this(10, 2);
 	}
 
-	public HogDescriptor(int cellSize, int normalizeSize) {
+	public HogSVMDescriptor(int cellSize, int normalizeSize) {
 		super();
 		this.cellSize = cellSize;
 		this.normalizeSize = normalizeSize;

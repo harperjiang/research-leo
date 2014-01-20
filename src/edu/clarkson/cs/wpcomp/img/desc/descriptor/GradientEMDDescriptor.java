@@ -8,20 +8,20 @@ import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.EMDDescriptor;
 
-public class GradientDescriptor implements EMDDescriptor {
+public class GradientEMDDescriptor implements EMDDescriptor {
 
 	private int cellSize;
 
 	// Area for local normalization
 	private int normalizeSize;
 
-	public GradientDescriptor(int cellSize, int normalizeSize) {
+	public GradientEMDDescriptor(int cellSize, int normalizeSize) {
 		super();
 		this.cellSize = cellSize;
 		this.normalizeSize = normalizeSize;
 	}
 
-	public GradientDescriptor() {
+	public GradientEMDDescriptor() {
 		this(6, 20);
 	}
 

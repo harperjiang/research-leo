@@ -30,7 +30,8 @@ public class Histogram {
 	}
 
 	public Integer get(Object key) {
-		return values.get(key);
+		Integer val = values.get(key);
+		return null == val ? 0 : val;
 	}
 
 	public Feature getData() {

@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 
-public class GradientDescriptorTest extends GradientDescriptor {
+public class GradientEMDDescriptorTest {
 
 	@Test
 	public void testDescribe() throws Exception {
-		new GradientDescriptor().describe(new ImageAccessor(ImageIO
+		new GradientEMDDescriptor().describe(new ImageAccessor(ImageIO
 				.read(new File("res/image/ebay_1.jpg"))));
 	}
 
