@@ -8,11 +8,16 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 
 public class NegativeSetGenerator {
@@ -24,72 +29,56 @@ public class NegativeSetGenerator {
 	public static final int STATE_PROCESS_DONE = 3;
 
 	public static void main(String[] args) throws Exception {
-		BlockingQueue<BufferedImage> imageQueue = new LinkedBlockingQueue<BufferedImage>(
-				100);
 		BlockingQueue<Feature> featureQueue = new LinkedBlockingQueue<Feature>(
 				1000);
-		HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
-		AtomicInteger state = new AtomicInteger(1);
+		SVMDescriptor hog = new HogSVMDescriptor(50, 1);
+		Semaphore outputLock = new Semaphore(0);
+		int cpuCount = 4;
+		ExecutorService threadPool = new ThreadPoolExecutor(cpuCount, cpuCount,
+				0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(100),
+				new ThreadFactory() {
+					@Override
+					public Thread newThread(Runnable r) {
+						Thread thread = new Thread(r);
+						thread.setDaemon(true);
+						return thread;
+					}
+				});
 
-		InputThread inputThread = new InputThread(imageQueue, state);
-		inputThread.start();
-
-		OutputThread outputThread = new OutputThread(featureQueue, state);
+		OutputThread outputThread = new OutputThread(featureQueue, outputLock);
 		outputThread.start();
 
-	}
-
-	protected static class InputThread extends Thread {
-		private Queue<BufferedImage> imageQueue;
-
-		private AtomicInteger state;
-
-		public InputThread(Queue<BufferedImage> imageQueue, AtomicInteger state) {
-			super();
-			this.imageQueue = imageQueue;
-			this.state = state;
-		}
-
-		public void run() {
-			File dir = new File("res/image/negative");
-			for (File file : dir.listFiles()) {
-				try {
-					imageQueue.offer(ImageIO.read(file));
-				} catch (IOException e) {
-					System.out.println(e);
-				}
+		int counter = 0;
+		File dir = new File("res/image/negative");
+		for (File file : dir.listFiles()) {
+			try {
+				threadPool.submit(new ProcessImage(ImageIO.read(file),
+						featureQueue, hog));
+				counter++;
+			} catch (IOException e) {
+				System.out.println(e);
 			}
-			state.set(STATE_LOAD_DONE);
 		}
+		outputLock.acquire(counter);
 	}
 
-	protected static class ProcessThread extends Thread {
-		private Queue<BufferedImage> imageQueue;
-
+	protected static class ProcessImage implements Runnable {
+		private BufferedImage image;
 		private Queue<Feature> featureQueue;
 
-		private AtomicInteger state;
+		private SVMDescriptor desc;
 
-		public ProcessThread(Queue<BufferedImage> imageQueue,
-				Queue<Feature> featureQueue, AtomicInteger state) {
+		public ProcessImage(BufferedImage image, Queue<Feature> featureQueue,
+				SVMDescriptor desc) {
 			super();
-			this.imageQueue = imageQueue;
+			this.image = image;
 			this.featureQueue = featureQueue;
-			this.state = state;
+			this.desc = desc;
 		}
 
 		@Override
 		public void run() {
-			while (!imageQueue.isEmpty() || state.get() != STATE_LOAD_DONE) {
-				if (imageQueue.isEmpty()) {
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					continue;
-				}
-			}
+			featureQueue.add(desc.describe(new ImageAccessor(image)));
 		}
 	}
 
@@ -97,21 +86,23 @@ public class NegativeSetGenerator {
 
 		private Queue<Feature> featureQueue;
 
-		private AtomicInteger state;
+		private Semaphore lock;
 
-		public OutputThread(Queue<Feature> featureQueue, AtomicInteger state) {
+		public OutputThread(Queue<Feature> featureQueue, Semaphore lock) {
 			super();
+			this.setDaemon(true);
 			this.featureQueue = featureQueue;
-			this.state = state;
+			this.lock = lock;
 		}
 
 		public void run() {
 			PrintWriter pw = null;
 			try {
 				pw = new PrintWriter(new FileOutputStream("negative"));
-				while (!(inputDone && featureQueue.isEmpty())) {
+				while (!featureQueue.isEmpty()) {
 					Feature feature = featureQueue.poll();
 					pw.println(MessageFormat.format("{0} {1}", 0, feature));
+					lock.release();
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
