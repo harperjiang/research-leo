@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
@@ -34,16 +35,7 @@ public class NegativeSetGenerator {
 		SVMDescriptor hog = new HogSVMDescriptor(50, 1);
 		Semaphore outputLock = new Semaphore(0);
 		int cpuCount = 4;
-		ExecutorService threadPool = new ThreadPoolExecutor(cpuCount, cpuCount,
-				0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(100),
-				new ThreadFactory() {
-					@Override
-					public Thread newThread(Runnable r) {
-						Thread thread = new Thread(r);
-						thread.setDaemon(true);
-						return thread;
-					}
-				});
+		ExecutorService threadPool = Executors.newFixedThreadPool(cpuCount);
 
 		OutputThread outputThread = new OutputThread(featureQueue, outputLock);
 		outputThread.start();
@@ -60,6 +52,7 @@ public class NegativeSetGenerator {
 			}
 		}
 		outputLock.acquire(counter);
+		threadPool.shutdown();
 	}
 
 	protected static class ProcessImage implements Runnable {
@@ -84,11 +77,11 @@ public class NegativeSetGenerator {
 
 	protected static class OutputThread extends Thread {
 
-		private Queue<Feature> featureQueue;
+		private BlockingQueue<Feature> featureQueue;
 
 		private Semaphore lock;
 
-		public OutputThread(Queue<Feature> featureQueue, Semaphore lock) {
+		public OutputThread(BlockingQueue<Feature> featureQueue, Semaphore lock) {
 			super();
 			this.setDaemon(true);
 			this.featureQueue = featureQueue;
@@ -99,10 +92,15 @@ public class NegativeSetGenerator {
 			PrintWriter pw = null;
 			try {
 				pw = new PrintWriter(new FileOutputStream("negative"));
-				while (!featureQueue.isEmpty()) {
-					Feature feature = featureQueue.poll();
-					pw.println(MessageFormat.format("{0} {1}", 0, feature));
-					lock.release();
+				while (true) {
+					Feature feature;
+					try {
+						feature = featureQueue.take();
+						pw.println(MessageFormat.format("{0} {1}", 0, feature));
+						lock.release();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
