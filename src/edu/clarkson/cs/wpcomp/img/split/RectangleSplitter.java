@@ -118,7 +118,7 @@ public class RectangleSplitter extends AbstractSplitter {
 		return max;
 	}
 
-	protected Rectangle lowerbound(Rectangle range) {
+	public Rectangle lowerbound(Rectangle range) {
 		if (null == range) {
 			range = new Rectangle(0, 0, accessor.getWidth(),
 					accessor.getHeight());

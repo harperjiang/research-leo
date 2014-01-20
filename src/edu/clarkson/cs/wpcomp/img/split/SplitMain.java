@@ -20,7 +20,7 @@ public class SplitMain {
 		BufferedImage input = ImageIO.read(new File(
 				"res/image/split/bbc_screen.png"));
 
-		BufferedImage gradient = GradientHelper.gradientImage(input);
+		BufferedImage gradient = GradientHelper.gradientImage(input, 0);
 
 		ColorAccessor accessor = new ImageAccessor(gradient);
 

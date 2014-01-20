@@ -14,7 +14,7 @@ public class ImageAcessorMain {
 	public static void main(String[] args) throws IOException {
 		BufferedImage image = ImageIO
 				.read(new File("res/image/logo/ebay_1.jpg"));
-		BufferedImage gradient = GradientHelper.gradientImage(image);
+		BufferedImage gradient = GradientHelper.gradientImage(image, 0);
 
 		ImageAccessor accessor = new ImageAccessor(gradient);
 

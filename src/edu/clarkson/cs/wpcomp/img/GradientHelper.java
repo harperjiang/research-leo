@@ -8,13 +8,14 @@ import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 
 public class GradientHelper {
 
-	public static BufferedImage gradientImage(BufferedImage input) {
+	public static BufferedImage gradientImage(BufferedImage input, int threshold) {
 		BufferedImage output = new BufferedImage(input.getWidth(),
 				input.getHeight(), BufferedImage.TYPE_INT_RGB);
 		ColorAccessor accessor = new ImageAccessor(input);
 		for (int i = 0; i < input.getWidth(); i++) {
 			for (int j = 0; j < input.getHeight(); j++) {
 				int value = unifiedGradient(accessor, i, j);
+				value = value >= threshold ? value : 0;
 				output.setRGB(i, j, new Color(value, value, value).getRGB());
 			}
 		}
@@ -82,7 +83,7 @@ public class GradientHelper {
 			qh = -qh;
 		}
 
-		double val = Math.sqrt(Math.pow(qv, 2) + Math.pow(qh, 2));
+		double val = Math.sqrt((Math.pow(qv, 2) + Math.pow(qh, 2)) / 2);
 
 		double angle = Math.acos((double) qh / val);
 		int dir = (int) Math.floor(9 * angle / (Math.PI));
