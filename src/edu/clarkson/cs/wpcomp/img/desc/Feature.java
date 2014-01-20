@@ -1,5 +1,6 @@
 package edu.clarkson.cs.wpcomp.img.desc;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +58,10 @@ public class Feature {
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for (double val : data) {
-			builder.append(String.format("%.4f", val)).append(" ");
+		for (int i = 0; i < data.size(); i++) {
+			double val = data.get(i);
+			builder.append(MessageFormat.format("{0}:{1} ", i,
+					String.format("%.4f", val)));
 		}
 		return builder.toString().trim();
 	}
