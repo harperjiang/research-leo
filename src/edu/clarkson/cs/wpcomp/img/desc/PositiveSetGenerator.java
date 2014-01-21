@@ -34,7 +34,7 @@ public class PositiveSetGenerator {
 
 		HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
 
-		for (int size = 1000; size > 100; size -= 50) {
+		for (int size = 1000; size > 100; size -= 10) {
 			BufferedImage scale = ImageTransformer.scale(croped, size, size);
 			scale = ImageTransformer.scale(scale, 500, 500);
 			Feature feature = hog.describe(new ImageAccessor(scale));

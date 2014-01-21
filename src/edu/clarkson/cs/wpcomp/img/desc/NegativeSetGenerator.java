@@ -50,6 +50,7 @@ public class NegativeSetGenerator {
 		for (int i = 0; i < cpuCount; i++) {
 			threadPool[i].setExit(true);
 		}
+		outputThread.setExit(true);
 	}
 
 	protected static class ProcessThread extends Thread {
@@ -95,18 +96,23 @@ public class NegativeSetGenerator {
 
 		private Semaphore lock;
 
+		private boolean exit = false;
+
 		public OutputThread(BlockingQueue<Feature> featureQueue, Semaphore lock) {
 			super();
-			this.setDaemon(true);
 			this.featureQueue = featureQueue;
 			this.lock = lock;
+		}
+
+		public void setExit(boolean exit) {
+			this.exit = exit;
 		}
 
 		public void run() {
 			PrintWriter pw = null;
 			try {
 				pw = new PrintWriter(new FileOutputStream("negative"));
-				while (true) {
+				while (!exit) {
 					Feature feature;
 					try {
 						feature = featureQueue.take();
