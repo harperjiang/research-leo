@@ -41,6 +41,5 @@ public class PositiveSetGenerator {
 			pw.println(MessageFormat.format("{0} {1}", 1, feature));
 		}
 		pw.close();
-
 	}
 }

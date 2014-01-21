@@ -115,7 +115,9 @@ public class NegativeSetGenerator {
 				while (!exit) {
 					Feature feature;
 					try {
-						feature = featureQueue.take();
+						feature = featureQueue.poll(1, TimeUnit.SECONDS);
+						if (feature == null)
+							continue;
 						pw.println(MessageFormat.format("{0} {1}", 0, feature));
 						lock.release();
 					} catch (InterruptedException e) {
