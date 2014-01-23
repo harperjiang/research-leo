@@ -37,7 +37,7 @@ public class NegativeSetGenerator {
 		}
 
 		int counter = 0;
-		File dir = new File("res/image/negative");
+		File dir = new File("res/image/svm/negative");
 		for (File file : dir.listFiles()) {
 			try {
 				imageQueue.put(ImageIO.read(file));

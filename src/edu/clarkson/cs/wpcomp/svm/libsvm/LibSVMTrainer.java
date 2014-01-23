@@ -2,12 +2,11 @@ package edu.clarkson.cs.wpcomp.svm.libsvm;
 
 import java.io.File;
 
-import javax.xml.crypto.Data;
-
 import org.slf4j.LoggerFactory;
 
 import edu.clarkson.cs.wpcomp.common.proc.OutputHandler;
 import edu.clarkson.cs.wpcomp.common.proc.ProcessRunner;
+import edu.clarkson.cs.wpcomp.svm.DataSet;
 import edu.clarkson.cs.wpcomp.svm.FileDataSet;
 import edu.clarkson.cs.wpcomp.svm.FileModel;
 import edu.clarkson.cs.wpcomp.svm.Model;
@@ -18,7 +17,7 @@ public class LibSVMTrainer implements Trainer {
 	private static final String SVM_TRAIN = "svm-train";
 
 	@Override
-	public Model train(Data input) {
+	public Model train(DataSet input) {
 		if (!(input instanceof FileDataSet)) {
 			throw new IllegalArgumentException();
 		}

@@ -23,7 +23,7 @@ public class PositiveSetGenerator {
 		// Get a picture and transform it by scaling it
 
 		BufferedImage image = ImageIO.read(new File(
-				"res/image/positive/logo.jpg"));
+				"res/image/svm/positive/logo.jpg"));
 		BufferedImage gradient = GradientHelper.gradientImage(image, 30);
 		ColorAccessor accessor = new ImageAccessor(gradient);
 		RectangleSplitter splitter = new RectangleSplitter(accessor);
