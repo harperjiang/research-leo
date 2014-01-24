@@ -133,6 +133,10 @@ public class RectangleSplitter extends AbstractSplitter {
 			if (preprocess[range.x + i][range.y].height < bound.height)
 				break;
 		}
+		if(i == range.width) {
+			// Blank rectangle
+			return null;
+		}
 		lowerbound.x += i - 1;
 		lowerbound.width -= i - 1;
 		for (i = range.width - 1; i > 0; i--) {
@@ -152,7 +156,8 @@ public class RectangleSplitter extends AbstractSplitter {
 			}
 		}
 		lowerbound.height -= i - 1;
-
+		if (lowerbound.width < 0 || lowerbound.height < 0)
+			throw new IllegalArgumentException();
 		return lowerbound;
 	}
 }
