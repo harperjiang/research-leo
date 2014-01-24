@@ -1,7 +1,15 @@
 package edu.clarkson.cs.wpcomp.html.phantomjs;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +31,12 @@ public class PJExecutor {
 		this.currentDir = currentDir;
 	}
 
-	public void execute(String command) {
-		File cmdFile = new File(MessageFormat.format("res/phantomjs/{0}.js",
+	public void execute(String command, Map<String, String> params) {
+		// Template File
+		File templateFile = new File(MessageFormat.format("res/phantomjs/{0}",
 				command));
+		File cmdFile = replace(templateFile, params);
+
 		ProcessRunner runner = new ProcessRunner(PJEnv.MAIN,
 				cmdFile.getAbsolutePath());
 		runner.setCurrentDir(currentDir);
@@ -42,6 +53,35 @@ public class PJExecutor {
 		try {
 			runner.runAndWait();
 		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected File replace(File templateFile, Map<String, String> params) {
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					new FileInputStream(templateFile)));
+			File outputFile = new File(templateFile.getAbsolutePath() + ".js");
+
+			StringBuilder buffer = new StringBuilder();
+
+			String line = null;
+			while (null != (line = br.readLine())) {
+				buffer.append(line).append("\n");
+			}
+			br.close();
+
+			String output = buffer.toString();
+			for (Entry<String, String> entry : params.entrySet()) {
+				output = output.replaceAll("\\{" + entry.getKey() + "\\}",
+						entry.getValue());
+			}
+
+			PrintWriter pw = new PrintWriter(new FileOutputStream(outputFile));
+			pw.print(output);
+			pw.close();
+			return outputFile;
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
