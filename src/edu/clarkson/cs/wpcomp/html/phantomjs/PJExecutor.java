@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,14 +32,18 @@ public class PJExecutor {
 		this.currentDir = currentDir;
 	}
 
-	public void execute(String command, Map<String, String> params) {
+	public void execute(String command, String... params) {
 		// Template File
-		File templateFile = new File(MessageFormat.format("res/phantomjs/{0}",
+		File cmdFile = new File(MessageFormat.format("res/phantomjs/{0}.js",
 				command));
-		File cmdFile = replace(templateFile, params);
-
-		ProcessRunner runner = new ProcessRunner(PJEnv.MAIN,
-				cmdFile.getAbsolutePath());
+		String[] newparam = new String[(params == null || params.length == 0) ? 2
+				: params.length + 2];
+		newparam[0] = PJEnv.MAIN;
+		newparam[1] = cmdFile.getAbsolutePath();
+		if (params != null && params.length != 0) {
+			System.arraycopy(params, 0, newparam, 2, params.length);
+		}
+		ProcessRunner runner = new ProcessRunner(newparam);
 		runner.setCurrentDir(currentDir);
 		runner.setHandler(new OutputHandler() {
 			@Override
