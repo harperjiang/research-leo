@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.html;
+package edu.clarkson.cs.wpcomp.html.htmlunit;
 
 import java.text.MessageFormat;
 

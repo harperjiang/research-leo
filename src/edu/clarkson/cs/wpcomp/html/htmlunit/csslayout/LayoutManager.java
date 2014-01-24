@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.html.csslayout;
+package edu.clarkson.cs.wpcomp.html.htmlunit.csslayout;
 
 import java.awt.Dimension;
 import java.awt.Insets;

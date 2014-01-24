@@ -1,6 +1,7 @@
 package edu.clarkson.cs.wpcomp.common.proc;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -14,6 +15,8 @@ public class ProcessRunner {
 	private String[] commands;
 
 	private OutputHandler handler;
+
+	private File currentDir;
 
 	private transient Process process;
 
@@ -31,6 +34,9 @@ public class ProcessRunner {
 
 		ProcessBuilder builder = new ProcessBuilder(commands);
 		builder.redirectErrorStream(true);
+		if (null != currentDir) {
+			builder.directory(currentDir);
+		}
 
 		process = builder.start();
 		int result = process.waitFor();
@@ -74,6 +80,14 @@ public class ProcessRunner {
 
 	public void setHandler(OutputHandler handler) {
 		this.handler = handler;
+	}
+
+	public File getCurrentDir() {
+		return currentDir;
+	}
+
+	public void setCurrentDir(File currentDir) {
+		this.currentDir = currentDir;
 	}
 
 	public static interface Callback {

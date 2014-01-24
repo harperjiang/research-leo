@@ -2,6 +2,7 @@ package edu.clarkson.cs.wpcomp.svm.libsvm;
 
 import java.io.File;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.clarkson.cs.wpcomp.common.proc.OutputHandler;
@@ -15,6 +16,8 @@ import edu.clarkson.cs.wpcomp.svm.Trainer;
 public class LibSVMTrainer implements Trainer {
 
 	private static final String SVM_TRAIN = "svm-train";
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public Model train(DataSet input) {
@@ -30,6 +33,9 @@ public class LibSVMTrainer implements Trainer {
 			@Override
 			public void output(String input) {
 				// TODO If there's error message,throw an exception
+				if (logger.isDebugEnabled()) {
+					logger.debug(input);
+				}
 			}
 		});
 		try {
