@@ -54,7 +54,7 @@ public class TestSetGenerator {
 		BufferedImage gradient = GradientHelper.gradientImage(image, 30);
 		ColorAccessor accessor = new ImageAccessor(gradient);
 		RectangleSplitter splitter = new RectangleSplitter(accessor);
-		Rectangle range = splitter.lowerbound(null);
+		Rectangle range = splitter.lowerBound(null);
 		BufferedImage croped = CropHelper.crop(image, range);
 		return croped;
 	}

@@ -4,13 +4,14 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import edu.clarkson.cs.wpcomp.html.phantomjs.PJExecutor;
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.MarkHelper;
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.split.Split;
 
 public class PhishMain {
@@ -24,16 +25,21 @@ public class PhishMain {
 
 		BufferedImage input = ImageIO.read(new File("workdir/phishing.png"));
 		Split split = new Split();
+		split.setLevel(1);
 		List<Rectangle> ranges = split.split(input);
 
-		int i = 0;
+		ColorAccessor accessor = new ImageAccessor(input);
+
 		for (Rectangle rect : ranges) {
-			if (rect.width * rect.height >= 400) {
-				String name = MessageFormat.format("range{0}.png", i++);
-				BufferedImage crop = CropHelper.crop(input, rect);
-				ImageIO.write(crop, "png", new File("workdir/" + name));
-			}
+			MarkHelper.redrect(rect, accessor);
+//			if (rect.width * rect.height >= 400) {
+//				String name = MessageFormat.format("range{0}.png", i++);
+//				BufferedImage crop = CropHelper.crop(input, rect);
+//				ImageIO.write(crop, "png", new File("workdir/" + name));
+//			}
+			
 		}
+		ImageIO.write(input, "png", new File("workdir/phishingmark.png"));
 	}
 
 }
