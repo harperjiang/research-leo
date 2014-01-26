@@ -127,6 +127,36 @@ public class LineSplitter extends AbstractSplitter {
 		});
 	}
 
+	public LineSegment firstsplit(Rectangle range) {
+		return split(range, new SplitCondition() {
+
+			@Override
+			public boolean satisfy(int point) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public int bias(int point) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public int fastbreak(int point, int maxbias) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public int postprocess(int point) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+		});
+	}
+
 	protected LineSegment split(Rectangle range, SplitCondition condition) {
 		if (null == range) {
 			range = new Rectangle(0, 0, accessor.getWidth(),
