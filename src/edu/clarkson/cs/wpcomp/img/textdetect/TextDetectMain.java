@@ -1,53 +1,38 @@
 package edu.clarkson.cs.wpcomp.img.textdetect;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import edu.clarkson.cs.wpcomp.img.GradientHelper;
+import edu.clarkson.cs.wpcomp.img.MarkHelper;
+import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
+import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.split.LineSegment;
+import edu.clarkson.cs.wpcomp.img.split.LineSplitter;
+
 public class TextDetectMain {
 
-	static final char[] SYMBOL = { ',', '.', '!', '\"', '\'', '?', '-' };
-
-	static StringBuilder ALPHABET;
-
-	static {
-		ALPHABET = new StringBuilder();
-		for (int i = 0; i < 26; i++) {
-			ALPHABET.append((char)('a' + i));
-			ALPHABET.append((char)('A' + i));
-		}
-		for (int i = 0; i < 10; i++) {
-			ALPHABET.append((char)('0' + i));
-		}
-		ALPHABET.append(SYMBOL);
-	}
-
 	public static void main(String[] args) throws IOException {
-		BufferedImage image = new BufferedImage(1000, 200,
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage buffered = ImageIO.read(new File(
+				"res/image/split/text_2.png"));
+		ColorAccessor image = new ImageAccessor(buffered);
+		BufferedImage gradient = GradientHelper.gradientImage(buffered, 10);
+		ColorAccessor accessor = new ImageAccessor(gradient);
+		LineSplitter line = new LineSplitter(accessor);
 
-		Graphics2D graphic = image.createGraphics();
-		graphic.setColor(Color.YELLOW);
-		graphic.fillRect(0, 0, 1000, 200);
-		graphic.setColor(Color.BLACK);
-		graphic.setFont(new Font("Sans Serif", Font.BOLD, 14));
+		Rectangle start = null;
+		while (true) {
+			LineSegment split = line.maxMarginSplit(start, true);
+			MarkHelper.redline(split, image);
 
-		StringBuilder sb = new StringBuilder();
-		Random random = new Random(System.currentTimeMillis());
-		int length = random.nextInt(100) + 1;
-
-		for (int i = 0; i < length; i++) {
-			sb.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
+			break;
 		}
-
-		graphic.drawString(sb.toString(), 20, 30);
-
-		ImageIO.write(image, "png", new File("text.png"));
+		ImageIO.write(buffered, "png", new File(
+				"res/image/split/text_split.png"));
 	}
+
 }

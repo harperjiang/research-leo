@@ -12,18 +12,23 @@ public class LineSplitter extends AbstractSplitter {
 	}
 
 	public LineSegment centralSplit(Rectangle range) {
-		return split(range, new CentralSplitCondition());
+		return split(range, new CentralSplitCondition(), null);
 	}
 
 	public LineSegment maxMarginSplit(Rectangle range) {
-		return split(range, new MaxMarginSplitCondition());
+		return split(range, new MaxMarginSplitCondition(), null);
+	}
+
+	public LineSegment maxMarginSplit(Rectangle range, boolean preferH) {
+		return split(range, new MaxMarginSplitCondition(), preferH);
 	}
 
 	public LineSegment firstSplit(Rectangle range) {
-		return split(range, new FirstSplitCondition());
+		return split(range, new FirstSplitCondition(), null);
 	}
 
-	protected LineSegment split(Rectangle range, SplitCondition condition) {
+	public LineSegment split(Rectangle range, SplitCondition condition,
+			Boolean preferH) {
 		if (null == range) {
 			range = new Rectangle(0, 0, accessor.getWidth(),
 					accessor.getHeight());
@@ -31,6 +36,9 @@ public class LineSplitter extends AbstractSplitter {
 		condition.setRange(range);
 		LineSegment vs = vsplit(range, condition);
 		LineSegment hs = hsplit(range, condition);
+		if (preferH != null) {
+			return preferH ? hs : vs;
+		}
 		if (vs == null || hs == null) {
 			return vs == null ? hs : vs;
 		}
