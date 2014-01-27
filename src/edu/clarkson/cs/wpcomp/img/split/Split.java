@@ -14,18 +14,25 @@ public class Split {
 
 	private int level = 5;
 
-	private int widthThreshold = 5;
+	private List<Checker> checkers;
 
-	private int heightThreshold = 5;
+	private RectangleSplitter rect;
 
-	private int areaThreshold = 100;
+	private LineSplitter line;
+
+	public Split() {
+		super();
+		checkers = new ArrayList<Checker>();
+		checkers.add(new SizeChecker());
+		checkers.add(new TextChecker());
+	}
 
 	public List<Rectangle> split(BufferedImage input) throws IOException {
 		BufferedImage gradient = GradientHelper.gradientImage(input, 0);
 		ColorAccessor accessor = new ImageAccessor(gradient);
 
-		RectangleSplitter rect = new RectangleSplitter(accessor);
-		LineSplitter line = new LineSplitter(accessor);
+		rect = new RectangleSplitter(accessor);
+		line = new LineSplitter(accessor);
 
 		List<Rectangle> source = new ArrayList<Rectangle>();
 		List<Rectangle> result = new ArrayList<Rectangle>();
@@ -40,7 +47,7 @@ public class Split {
 				if (fence == null)
 					// Blank Rectangle
 					continue;
-				LineSegment lc = line.maxmarginsplit(fence);
+				LineSegment lc = line.maxMarginSplit(fence);
 
 				if (null == lc) {
 					rect.removeBorder(fence);
@@ -71,20 +78,22 @@ public class Split {
 						result.add(right);
 				}
 			}
-			source = result;
+			source = new ArrayList<Rectangle>();
+			for (Rectangle r : result) {
+				if (check(r))
+					source.add(r);
+			}
 			result = new ArrayList<Rectangle>();
 		}
-
-		for (Rectangle r : source) {
-			if (check(r))
-				result.add(r);
-		}
-		return result;
+		return source;
 	}
 
 	private boolean check(Rectangle r) {
-		return r.width > widthThreshold && r.height > heightThreshold
-				&& r.width * r.height > areaThreshold;
+		for (Checker checker : checkers) {
+			if (!checker.check(r, rect, line))
+				return false;
+		}
+		return true;
 	}
 
 	public int getLevel() {

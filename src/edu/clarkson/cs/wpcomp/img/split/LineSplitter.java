@@ -11,150 +11,16 @@ public class LineSplitter extends AbstractSplitter {
 		super(accessor);
 	}
 
-	public LineSegment centralsplit(Rectangle range) {
-		return split(range, new SplitCondition() {
-
-			@Override
-			public boolean satisfy(int point) {
-				if (isHorizontal()) {
-					return preprocess[range.x][point].width >= range.width;
-				} else {
-					return preprocess[point][range.y].height >= range.height;
-				}
-			}
-
-			@Override
-			public int bias(int point) {
-				if (isHorizontal()) {
-					return Math.abs(point - (range.y + range.height / 2));
-				} else {
-					return Math.abs(point - (range.x + range.width / 2));
-				}
-			}
-
-			@Override
-			public int fastbreak(int point, int maxbias) {
-				if (isHorizontal()) {
-					return (point - (range.y + range.height / 2)) > maxbias ? (range.y
-							+ range.height - 1)
-							: point;
-				} else {
-					return (point - (range.x + range.width / 2)) > maxbias ? (range.x
-							+ range.width - 1)
-							: point;
-				}
-			}
-
-			@Override
-			public int postprocess(int point) {
-				if (isHorizontal()) {
-					int top, bottom;
-					for (top = point; top > 0
-							&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
-						;
-					for (bottom = point; bottom < range.y + range.height - 1
-							&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
-						;
-					return (top + bottom) / 2;
-				} else {
-					int left, right;
-					for (left = point; left > 0
-							&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
-						;
-					for (right = point; right < range.x + range.width - 1
-							&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
-						;
-					return (left + right) / 2;
-				}
-			}
-
-		});
+	public LineSegment centralSplit(Rectangle range) {
+		return split(range, new CentralSplitCondition());
 	}
 
-	public LineSegment maxmarginsplit(Rectangle range) {
-		return split(range, new SplitCondition() {
-
-			@Override
-			public boolean satisfy(int point) {
-				if (isHorizontal()) {
-					return preprocess[range.x][point].width >= range.width;
-				} else {
-					return preprocess[point][range.y].height >= range.height;
-				}
-			}
-
-			protected int[] margin(int point) {
-				if (isHorizontal()) {
-					int top, bottom;
-					for (top = point; top > range.y
-							&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
-						;
-					for (bottom = point; bottom < range.y + range.height - 1
-							&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
-						;
-					return new int[] { top, bottom };
-				} else {
-					int left, right;
-					for (left = point; left > range.x
-							&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
-						;
-					for (right = point; right < range.x + range.width - 1
-							&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
-						;
-					return new int[] { left, right };
-				}
-			}
-
-			@Override
-			public int bias(int point) {
-				int[] margin = margin(point);
-				return -(margin[1] - margin[0] - 2);
-			}
-
-			@Override
-			public int fastbreak(int point, int maxbias) {
-				if (!satisfy(point))
-					return point;
-				int[] margin = margin(point);
-				return margin[1] - 1;
-			}
-
-			@Override
-			public int postprocess(int point) {
-				int[] margin = margin(point);
-				return (margin[0] + margin[1]) / 2;
-			}
-		});
+	public LineSegment maxMarginSplit(Rectangle range) {
+		return split(range, new MaxMarginSplitCondition());
 	}
 
-	public LineSegment firstsplit(Rectangle range) {
-		return split(range, new SplitCondition() {
-
-			@Override
-			public boolean satisfy(int point) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public int bias(int point) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public int fastbreak(int point, int maxbias) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public int postprocess(int point) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-		});
+	public LineSegment firstSplit(Rectangle range) {
+		return split(range, new FirstSplitCondition());
 	}
 
 	protected LineSegment split(Rectangle range, SplitCondition condition) {
@@ -258,5 +124,160 @@ public class LineSplitter extends AbstractSplitter {
 		public abstract int fastbreak(int point, int maxbias);
 
 		public abstract int postprocess(int point);
+	}
+
+	protected abstract class MarginSplitCondition extends SplitCondition {
+		protected int[] margin(int point) {
+			if (isHorizontal()) {
+				int top, bottom;
+				for (top = point; top > range.y
+						&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
+					;
+				for (bottom = point; bottom < range.y + range.height - 1
+						&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
+					;
+				return new int[] { top, bottom };
+			} else {
+				int left, right;
+				for (left = point; left > range.x
+						&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
+					;
+				for (right = point; right < range.x + range.width - 1
+						&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
+					;
+				return new int[] { left, right };
+			}
+		}
+	}
+
+	public class CentralSplitCondition extends SplitCondition {
+		@Override
+		public boolean satisfy(int point) {
+			if (isHorizontal()) {
+				return preprocess[range.x][point].width >= range.width;
+			} else {
+				return preprocess[point][range.y].height >= range.height;
+			}
+		}
+
+		@Override
+		public int bias(int point) {
+			if (isHorizontal()) {
+				return Math.abs(point - (range.y + range.height / 2));
+			} else {
+				return Math.abs(point - (range.x + range.width / 2));
+			}
+		}
+
+		@Override
+		public int fastbreak(int point, int maxbias) {
+			if (isHorizontal()) {
+				return (point - (range.y + range.height / 2)) > maxbias ? (range.y
+						+ range.height - 1)
+						: point;
+			} else {
+				return (point - (range.x + range.width / 2)) > maxbias ? (range.x
+						+ range.width - 1)
+						: point;
+			}
+		}
+
+		@Override
+		public int postprocess(int point) {
+			if (isHorizontal()) {
+				int top, bottom;
+				for (top = point; top > 0
+						&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
+					;
+				for (bottom = point; bottom < range.y + range.height - 1
+						&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
+					;
+				return (top + bottom) / 2;
+			} else {
+				int left, right;
+				for (left = point; left > 0
+						&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
+					;
+				for (right = point; right < range.x + range.width - 1
+						&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
+					;
+				return (left + right) / 2;
+			}
+		}
+	}
+
+	public class MaxMarginSplitCondition extends MarginSplitCondition {
+
+		@Override
+		public boolean satisfy(int point) {
+			if (isHorizontal()) {
+				return preprocess[range.x][point].width >= range.width;
+			} else {
+				return preprocess[point][range.y].height >= range.height;
+			}
+		}
+
+		@Override
+		public int bias(int point) {
+			int[] margin = margin(point);
+			return -(margin[1] - margin[0] - 2);
+		}
+
+		@Override
+		public int fastbreak(int point, int maxbias) {
+			if (!satisfy(point))
+				return point;
+			int[] margin = margin(point);
+			return margin[1] - 1;
+		}
+
+		@Override
+		public int postprocess(int point) {
+			int[] margin = margin(point);
+			return (margin[0] + margin[1]) / 2;
+		}
+	}
+
+	public class FirstSplitCondition extends MarginSplitCondition {
+
+		private int firstPoint = -1;
+
+		@Override
+		public boolean satisfy(int point) {
+			if (firstPoint != -1) {
+				boolean satisfy = false;
+				if (isHorizontal()) {
+					satisfy = preprocess[range.x][point].width >= range.width;
+				} else {
+					satisfy = preprocess[point][range.y].height >= range.height;
+				}
+				firstPoint = point;
+				return satisfy;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int bias(int point) {
+			return firstPoint == point ? 0 : Integer.MAX_VALUE;
+		}
+
+		@Override
+		public int fastbreak(int point, int maxbias) {
+			if (firstPoint != -1) {
+				// Jump to end
+				return isHorizontal() ? range.y + range.height - 1 : range.x
+						+ range.width - 1;
+			}
+			return point;
+		}
+
+		@Override
+		public int postprocess(int point) {
+			int[] margin = margin(point);
+			return (margin[0] + margin[1]) / 2;
+		}
+
 	}
 }
