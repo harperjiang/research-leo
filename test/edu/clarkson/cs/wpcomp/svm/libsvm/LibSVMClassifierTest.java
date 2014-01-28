@@ -21,14 +21,14 @@ public class LibSVMClassifierTest extends LibSVMClassifier {
 	@Test
 	public void testClassify() throws IOException {
 		LibSVMTrainer trainer = new LibSVMTrainer();
-		Model model = trainer.train(new FileDataSet(new File("res/svm/train")));
+		Model model = trainer.train(new FileDataSet(new File("res/svm/img/train")));
 		LibSVMClassifier classifier = new LibSVMClassifier();
 		DataSet result = classifier.classify(model, new FileDataSet(new File(
-				"res/svm/test")));
+				"res/svm/img/test")));
 		assertEquals(result.getClass(), FileDataSet.class);
 		FileDataSet resultds = (FileDataSet) result;
 		assertEquals(resultds.getFile().getAbsolutePath(), new File(
-				"res/svm/test.output").getAbsolutePath());
+				"res/svm/img/test.output").getAbsolutePath());
 		assertTrue(resultds.getFile().exists());
 
 		// There should be 90 positive and 90 negative
@@ -49,7 +49,7 @@ public class LibSVMClassifierTest extends LibSVMClassifier {
 
 	@AfterClass
 	public static void clear() {
-		new File("res/svm/test.output").delete();
-		new File("res/svm/train.model").delete();
+		new File("res/svm/img/test.output").delete();
+		new File("res/svm/img/train.model").delete();
 	}
 }

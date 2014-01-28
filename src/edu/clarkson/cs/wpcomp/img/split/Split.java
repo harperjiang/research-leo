@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -55,28 +56,14 @@ public class Split {
 					continue;
 				}
 
-				if (lc.isHorizontal()) {
-					Rectangle top = rect.lowerBound(new Rectangle(fence.x,
-							fence.y, fence.width, lc.from.y - fence.y));
-					if (null != top)
-						result.add(top);
-					Rectangle bottom = rect.lowerBound(new Rectangle(fence.x,
-							lc.from.y, fence.width, fence.y + fence.height
-									- lc.from.y));
-					if (null != bottom)
-						result.add(bottom);
-				}
-				if (lc.isVertical()) {
-					Rectangle left = rect.lowerBound(new Rectangle(fence.x,
-							fence.y, lc.from.x - fence.x, fence.height));
-					if (null != left)
-						result.add(left);
-					Rectangle right = rect.lowerBound(new Rectangle(lc.from.x,
-							fence.y, fence.x + fence.width - lc.from.x,
-							fence.height));
-					if (null != right)
-						result.add(right);
-				}
+				Rectangle[] split = GeometryHelper.split(fence, lc);
+
+				Rectangle top = rect.lowerBound(split[0]);
+				if (null != top)
+					result.add(top);
+				Rectangle bottom = rect.lowerBound(split[1]);
+				if (null != bottom)
+					result.add(bottom);
 			}
 			source = new ArrayList<Rectangle>();
 			for (Rectangle r : result) {

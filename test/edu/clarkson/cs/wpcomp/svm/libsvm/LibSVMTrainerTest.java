@@ -16,13 +16,13 @@ public class LibSVMTrainerTest extends LibSVMTrainer {
 
 	@AfterClass
 	public static void clearData() {
-		File generatedModel = new File("res/svm/train.model");
+		File generatedModel = new File("res/svm/img/train.model");
 		generatedModel.delete();
 	}
 	
 	@Test
 	public void testTrain() {
-		FileDataSet dataSet = new FileDataSet(new File("res/svm/train"));
+		FileDataSet dataSet = new FileDataSet(new File("res/svm/img/train"));
 		Model model = new LibSVMTrainer().train(dataSet);
 		assertEquals(model.getClass(), FileModel.class);
 

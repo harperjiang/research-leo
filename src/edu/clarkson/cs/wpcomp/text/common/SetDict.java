@@ -39,4 +39,8 @@ public class SetDict {
 	public boolean isWord(String input) {
 		return words.contains(input.toLowerCase());
 	}
+
+	public Set<String> getDict() {
+		return words;
+	}
 }
