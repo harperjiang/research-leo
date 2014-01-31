@@ -11,7 +11,7 @@ public class SizeChecker implements Checker {
 	private int areaThreshold = 100;
 
 	@Override
-	public boolean check(Rectangle r, Object... env) {
+	public boolean check(Rectangle r, CheckerEnv cenv) {
 		return r.width > widthThreshold && r.height > heightThreshold
 				&& r.width * r.height > areaThreshold;
 	}

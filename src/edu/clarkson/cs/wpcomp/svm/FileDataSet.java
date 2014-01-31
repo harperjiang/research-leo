@@ -18,5 +18,4 @@ public class FileDataSet implements DataSet {
 	public void setFile(File file) {
 		this.file = file;
 	}
-
 }

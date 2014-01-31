@@ -10,6 +10,7 @@ import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.split.Checker.CheckerEnv;
 
 public class Split {
 
@@ -20,6 +21,8 @@ public class Split {
 	private RectangleSplitter rect;
 
 	private LineSplitter line;
+
+	private CheckerEnv cenv;
 
 	public Split() {
 		super();
@@ -35,14 +38,18 @@ public class Split {
 		rect = new RectangleSplitter(accessor);
 		line = new LineSplitter(accessor);
 
+		cenv = new CheckerEnv();
+		cenv.lineSplitter = line;
+		cenv.rectSplitter = rect;
+		cenv.sourceImage = gradient;
+
 		List<Rectangle> source = new ArrayList<Rectangle>();
 		List<Rectangle> result = new ArrayList<Rectangle>();
+		List<Rectangle> mature = new ArrayList<Rectangle>();
 		source.add(new Rectangle(0, 0, accessor.getWidth(), accessor
 				.getHeight()));
 
-		int depth = level;
-
-		for (int i = 0; i < depth; i++) {
+		while (!source.isEmpty()) {
 			for (Rectangle r : source) {
 				Rectangle fence = rect.lowerBound(r);
 				if (fence == null)
@@ -51,8 +58,12 @@ public class Split {
 				LineSegment lc = line.maxMarginSplit(fence);
 
 				if (null == lc) {
-					rect.removeBorder(fence);
-					result.add(rect.removeBorder(fence));
+					Rectangle removed = rect.removeBorder(fence);
+					if (removed.equals(fence)) {
+						mature.add(removed);
+					} else {
+						result.add(removed);
+					}
 					continue;
 				}
 
@@ -67,17 +78,20 @@ public class Split {
 			}
 			source = new ArrayList<Rectangle>();
 			for (Rectangle r : result) {
-				if (check(r))
+				if (check(r)) {
 					source.add(r);
+				}
 			}
 			result = new ArrayList<Rectangle>();
 		}
+
+		source.addAll(mature);
 		return source;
 	}
 
 	private boolean check(Rectangle r) {
 		for (Checker checker : checkers) {
-			if (!checker.check(r, rect, line))
+			if (!checker.check(r, cenv))
 				return false;
 		}
 		return true;

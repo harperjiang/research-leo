@@ -33,9 +33,7 @@ public class LibSVMTrainer implements Trainer {
 			@Override
 			public void output(String input) {
 				// TODO If there's error message,throw an exception
-				if (logger.isDebugEnabled()) {
-					logger.debug(input);
-				}
+				
 			}
 		});
 		try {

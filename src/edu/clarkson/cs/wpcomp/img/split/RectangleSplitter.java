@@ -146,7 +146,7 @@ public class RectangleSplitter extends AbstractSplitter {
 				if (preprocess[range.x + i][range.y].height < bound.height)
 					break;
 			}
-			lowerbound.width -= range.width - 1 - i;
+			lowerbound.width -= range.width - 2 - i;
 		}
 		if (lefttop.width >= bound.width) {
 			for (i = 0; i < range.height; i++) {
@@ -166,9 +166,6 @@ public class RectangleSplitter extends AbstractSplitter {
 			}
 			lowerbound.height -= i - 1;
 		}
-		if (lowerbound.x < 0 || lowerbound.y < 0 || lowerbound.width < 0
-				|| lowerbound.height < 0)
-			throw new IllegalArgumentException();
 		return lowerbound;
 	}
 
@@ -176,36 +173,32 @@ public class RectangleSplitter extends AbstractSplitter {
 		// Detect the existance of border
 		// Here we define border to be a rectangle with most pixels on the
 		// border being colored
-		Rectangle test = new Rectangle(range.x + 1, range.y + 1,
-				range.width - 2, range.height - 2);
-
-		int xcounter = 0;
-		for (int i = test.x; i < test.x + test.width; i++) {
-			// If black point exceeds the threshold, determine not a
-			// border
-			if (Color.BLACK.equals(accessor.getValue(i, test.y)))
-				xcounter++;
-			if (Color.BLACK.equals(accessor.getValue(i, test.y + test.height
-					- 1)))
-				xcounter++;
-		}
-		if (test.width * borderThreshold < xcounter) {
-			return range;
-		}
-		int ycounter = 0;
-		for (int i = test.y; i < test.y + test.height; i++) {
-			if (Color.BLACK.equals(accessor.getValue(test.x, i)))
-				ycounter++;
-			if (Color.BLACK.equals(accessor
-					.getValue(test.x + test.width - 1, i)))
-				ycounter++;
-		}
-		if (test.height * borderThreshold < ycounter) {
-			return range;
-		}
+		/*
+		 * Rectangle test = new Rectangle(range.x + 1, range.y + 1, range.width
+		 * - 2, range.height - 2);
+		 * 
+		 * int xcounter = 0; for (int i = test.x; i < test.x + test.width; i++)
+		 * { // If black point exceeds the threshold, determine not a // border
+		 * if (Color.BLACK.equals(accessor.getValue(i, test.y))) xcounter++; if
+		 * (Color.BLACK.equals(accessor.getValue(i, test.y + test.height - 1)))
+		 * xcounter++; } if (test.width * borderThreshold < xcounter) { return
+		 * range; } int ycounter = 0; for (int i = test.y; i < test.y +
+		 * test.height; i++) { if (Color.BLACK.equals(accessor.getValue(test.x,
+		 * i))) ycounter++; if (Color.BLACK.equals(accessor .getValue(test.x +
+		 * test.width - 1, i))) ycounter++; } if (test.height * borderThreshold
+		 * < ycounter) { return range; }
+		 */
 		Rectangle maxSplit = maxSplit(range);
-		return null == maxSplit ? range : maxSplit;
+		if (maxSplit == null) {
+			return range;
+		}
+		if (maxSplit.x - range.x <= borderThreshold
+				&& maxSplit.y - range.y <= borderThreshold
+				&& (range.x + range.width - maxSplit.x - maxSplit.width) <= borderThreshold
+				&& (range.y + range.height - maxSplit.y - maxSplit.height) <= borderThreshold)
+			return maxSplit;
+		return range;
 	}
 
-	private double borderThreshold = 0.02d;
+	private int borderThreshold = 5;
 }

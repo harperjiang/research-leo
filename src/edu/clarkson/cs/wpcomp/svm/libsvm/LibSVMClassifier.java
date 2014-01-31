@@ -41,9 +41,6 @@ public class LibSVMClassifier implements Classifier {
 			@Override
 			public void output(String input) {
 				// TODO Handle error input
-				if (logger.isDebugEnabled()) {
-					logger.debug(input);
-				}
 			}
 		});
 		try {
