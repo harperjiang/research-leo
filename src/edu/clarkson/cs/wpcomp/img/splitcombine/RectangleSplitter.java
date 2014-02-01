@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.split;
+package edu.clarkson.cs.wpcomp.img.splitcombine;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -200,5 +200,5 @@ public class RectangleSplitter extends AbstractSplitter {
 		return range;
 	}
 
-	private int borderThreshold = 5;
+	private int borderThreshold = 6;
 }

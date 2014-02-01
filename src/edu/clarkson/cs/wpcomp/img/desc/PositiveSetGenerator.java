@@ -14,7 +14,7 @@ import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
-import edu.clarkson.cs.wpcomp.img.split.RectangleSplitter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.RectangleSplitter;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
 public class PositiveSetGenerator {

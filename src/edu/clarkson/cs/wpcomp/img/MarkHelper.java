@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
-import edu.clarkson.cs.wpcomp.img.split.LineSegment;
+import edu.clarkson.cs.wpcomp.img.splitcombine.LineSegment;
 
 public class MarkHelper {
 

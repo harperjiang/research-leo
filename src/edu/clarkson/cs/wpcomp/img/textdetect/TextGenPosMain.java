@@ -18,7 +18,7 @@ import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Feature;
-import edu.clarkson.cs.wpcomp.img.split.RectangleSplitter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.RectangleSplitter;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 import edu.clarkson.cs.wpcomp.text.processor.Dicts;
 

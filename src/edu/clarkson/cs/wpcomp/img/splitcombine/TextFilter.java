@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.split;
+package edu.clarkson.cs.wpcomp.img.splitcombine;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.collections.CollectionUtils;
+
 import edu.clarkson.cs.wpcomp.img.CropHelper;
 import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -26,7 +30,7 @@ import edu.clarkson.cs.wpcomp.svm.FileDataSet;
 import edu.clarkson.cs.wpcomp.svm.FileModel;
 import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMClassifier;
 
-public class TextChecker implements Checker {
+public class TextFilter implements Filter {
 
 	private File tempDir;
 
@@ -34,9 +38,9 @@ public class TextChecker implements Checker {
 
 	private TextImageDescriptor desc;
 
-	private int heightThreshold = 20;
+	private int heightThreshold = 25;
 
-	public TextChecker() {
+	public TextFilter() {
 		super();
 		classifier = new LibSVMClassifier();
 		desc = new TextImageDescriptor();
@@ -44,7 +48,7 @@ public class TextChecker implements Checker {
 	}
 
 	@Override
-	public boolean check(Rectangle range, CheckerEnv cenv) {
+	public boolean filter(Rectangle range, SplitEnv cenv) {
 		List<Rectangle> source = new ArrayList<Rectangle>();
 		List<Rectangle> result = new ArrayList<Rectangle>();
 		List<Rectangle> output = new ArrayList<Rectangle>();
@@ -69,6 +73,11 @@ public class TextChecker implements Checker {
 			source.addAll(result);
 			result = new ArrayList<Rectangle>();
 		}
+		if (CollectionUtils.isEmpty(output)) {
+			// This is an empty range which can be filtered out
+			return false;
+		}
+		
 		// Many companies use single word as Logo
 		if (output.size() == 1 && output.get(0).height > heightThreshold) {
 			return true;
@@ -127,5 +136,17 @@ public class TextChecker implements Checker {
 
 	public void setTempDir(File tempDir) {
 		this.tempDir = tempDir;
+	}
+
+	public static void main(String[] args) throws IOException {
+		TextFilter filter = new TextFilter();
+		BufferedImage image = ImageIO.read(new File(
+				"res/image/split/text_3.png"));
+		SplitEnv cenv = new SplitEnv();
+		cenv.sourceImage = image;
+		cenv.lineSplitter = new LineSplitter(new ImageAccessor(image));
+		cenv.rectSplitter = new RectangleSplitter(new ImageAccessor(image));
+		filter.filter(new Rectangle(0, 0, image.getWidth(), image.getHeight()),
+				cenv);
 	}
 }

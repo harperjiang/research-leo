@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.split;
+package edu.clarkson.cs.wpcomp.img.splitcombine;
 
 import java.awt.Point;
 import java.awt.Rectangle;

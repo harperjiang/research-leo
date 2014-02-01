@@ -1,8 +1,8 @@
-package edu.clarkson.cs.wpcomp.img.split;
+package edu.clarkson.cs.wpcomp.img.splitcombine;
 
 import java.awt.Rectangle;
 
-public class SizeChecker implements Checker {
+public class SizeFilter implements Filter {
 
 	private int widthThreshold = 5;
 
@@ -11,7 +11,7 @@ public class SizeChecker implements Checker {
 	private int areaThreshold = 100;
 
 	@Override
-	public boolean check(Rectangle r, CheckerEnv cenv) {
+	public boolean filter(Rectangle r, SplitEnv cenv) {
 		return r.width > widthThreshold && r.height > heightThreshold
 				&& r.width * r.height > areaThreshold;
 	}

@@ -9,12 +9,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import edu.clarkson.cs.wpcomp.html.phantomjs.PJExecutor;
 import edu.clarkson.cs.wpcomp.img.CropHelper;
-import edu.clarkson.cs.wpcomp.img.MarkHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
-import edu.clarkson.cs.wpcomp.img.split.Split;
+import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
 
 public class PhishMain {
 
@@ -27,7 +25,6 @@ public class PhishMain {
 
 		BufferedImage input = ImageIO.read(new File("workdir/phishing.png"));
 		Split split = new Split();
-		split.setLevel(4);
 		List<Rectangle> ranges = split.split(input);
 
 		ColorAccessor accessor = new ImageAccessor(input);
