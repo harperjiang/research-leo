@@ -60,7 +60,7 @@ public class Feature {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < data.size(); i++) {
 			double val = data.get(i);
-			builder.append(MessageFormat.format("{0}:{1} ", i,
+			builder.append(MessageFormat.format("{0}:{1} ", String.valueOf(i),
 					String.format("%.4f", val)));
 		}
 		return builder.toString().trim();

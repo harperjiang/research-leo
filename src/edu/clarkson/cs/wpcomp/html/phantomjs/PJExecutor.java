@@ -48,10 +48,6 @@ public class PJExecutor {
 		runner.setHandler(new OutputHandler() {
 			@Override
 			public void output(String input) {
-				// Output the content to log file
-				if (logger.isDebugEnabled()) {
-					logger.debug(input);
-				}
 			}
 		});
 

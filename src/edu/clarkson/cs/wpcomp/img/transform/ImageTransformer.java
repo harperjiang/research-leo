@@ -9,15 +9,23 @@ public class ImageTransformer {
 
 	public static BufferedImage transform(BufferedImage input,
 			AffineTransform xform) {
-		int type = input.getSampleModel().getNumBands() == 3 ? BufferedImage.TYPE_INT_RGB
-				: BufferedImage.TYPE_INT_ARGB;
-		BufferedImage copy = new BufferedImage(input.getWidth(),
-				input.getHeight(), type);
-		copy.setData(input.getData());
+		// BufferedImage copy = null;
+		// if (input.getSampleModel().getNumBands() == 3) {
+		// copy = new BufferedImage(input.getWidth(), input.getHeight(),
+		// BufferedImage.TYPE_INT_RGB);
+		// } else if (input.getType() == BufferedImage.TYPE_INT_ARGB
+		// || input.getType() == BufferedImage.TYPE_INT_RGB
+		// || input.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+		// copy = new BufferedImage(input.getWidth(), input.getHeight(),
+		// input.getType());
+		// } else {
+		// throw new RuntimeException("Unrecognized Type:" + input.getType());
+		// }
+		// copy.setData(input.getData());
 		AffineTransformOp op = new AffineTransformOp(xform,
 				AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
-		Raster output = op.filter(copy.getData(), null);
+		Raster output = op.filter(input.getData(), null);
 
 		BufferedImage oimage = new BufferedImage(output.getWidth(),
 				output.getHeight(), input.getType());

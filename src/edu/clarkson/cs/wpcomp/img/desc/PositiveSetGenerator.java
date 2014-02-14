@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -20,26 +21,64 @@ import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 public class PositiveSetGenerator {
 
 	public static void main(String[] args) throws Exception {
-		// Get a picture and transform it by scaling it
+		generate(new File("res/image/svm/positive/logo.jpg"), new File(
+				"positive"));
+	}
 
-		BufferedImage image = ImageIO.read(new File(
-				"res/image/svm/positive/logo.jpg"));
+	public static void generate(File inputImage, File outputFeature)
+			throws Exception {
+		// Get a picture and transform it by scaling it
+		BufferedImage image = ImageIO.read(inputImage);
 		BufferedImage gradient = GradientHelper.gradientImage(image, 30);
 		ColorAccessor accessor = new ImageAccessor(gradient);
 		RectangleSplitter splitter = new RectangleSplitter(accessor);
 		Rectangle range = splitter.lowerBound(null);
 		BufferedImage croped = CropHelper.crop(image, range);
 
-		PrintWriter pw = new PrintWriter(new FileOutputStream("positive"));
+		PrintWriter pw = new PrintWriter(new FileOutputStream(outputFeature));
 
 		HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
 
-		for (int size = 1000; size > 100; size -= 10) {
+		for (int size = 1500; size > 100; size -= 5) {
 			BufferedImage scale = ImageTransformer.scale(croped, size, size);
 			scale = ImageTransformer.scale(scale, 500, 500);
 			Feature feature = hog.describe(new ImageAccessor(scale));
 			pw.println(MessageFormat.format("{0} {1}", 1, feature));
 		}
 		pw.close();
+	}
+
+	public static void generate(List<Input> inputImages, File outputFeature)
+			throws Exception {
+		PrintWriter pw = new PrintWriter(new FileOutputStream(outputFeature));
+		for (Input inputImage : inputImages) {
+			BufferedImage image = ImageIO.read(inputImage.file);
+			BufferedImage gradient = GradientHelper.gradientImage(image, 30);
+			ColorAccessor accessor = new ImageAccessor(gradient);
+			RectangleSplitter splitter = new RectangleSplitter(accessor);
+			Rectangle range = splitter.lowerBound(null);
+			if (range == null) {
+				System.out.println(inputImage.file.getName());
+			}
+			BufferedImage cropped = CropHelper.crop(image, range);
+
+			HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
+
+			BufferedImage scale = ImageTransformer.scale(cropped, 500, 500);
+			Feature feature = hog.describe(new ImageAccessor(scale));
+			pw.println(MessageFormat.format("{0} {1}", inputImage.value,
+					feature));
+		}
+		pw.close();
+	}
+
+	public static final class Input {
+		public File file;
+		public int value;
+
+		public Input(File file, int value) {
+			this.file = file;
+			this.value = value;
+		}
 	}
 }

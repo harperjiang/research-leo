@@ -24,7 +24,8 @@ public class TextGenNegMain {
 
 	public static void main(String[] args) throws Exception {
 
-		File folder = new File("res/image/svm/negative");
+		File folder = new File(
+				"/home/harper/Research/webpage-comparison/imageset_test");
 
 		BlockingQueue<BufferedImage> inputQueue = new LinkedBlockingQueue<BufferedImage>(
 				100);
@@ -46,8 +47,12 @@ public class TextGenNegMain {
 		outputThread.start();
 
 		for (File file : folder.listFiles()) {
-			inputQueue.put(ImageIO.read(file));
-			count++;
+			try {
+				inputQueue.put(ImageIO.read(file));
+				count++;
+			} catch (Exception e) {
+				// Ignore sliently
+			}
 		}
 
 		lock.acquire(count);
@@ -92,10 +97,10 @@ public class TextGenNegMain {
 		public void run() {
 			try {
 				PrintWriter pw = new PrintWriter(new FileOutputStream(
-						"res/svm/text/negative"));
+						"res/svm/perf/text_acc/neg_test"));
 				while (!exit) {
 					Feature feature = output.poll(1, TimeUnit.SECONDS);
-					if(null == feature)
+					if (null == feature)
 						continue;
 					pw.println(MessageFormat.format("{0} {1}", 0, feature));
 					lock.release();
@@ -139,6 +144,9 @@ public class TextGenNegMain {
 					throw new RuntimeException(e);
 				} catch (IOException e) {
 					throw new RuntimeException(e);
+				} catch (Exception e) {
+					// Ignore
+					e.printStackTrace();
 				}
 			}
 		}

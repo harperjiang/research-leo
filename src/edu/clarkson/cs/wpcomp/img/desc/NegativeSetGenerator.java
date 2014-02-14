@@ -15,18 +15,19 @@ import javax.imageio.ImageIO;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
+import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
 public class NegativeSetGenerator {
 
 	public static void main(String[] args) throws Exception {
-		BlockingQueue<BufferedImage> imageQueue = new LinkedBlockingQueue<BufferedImage>(
+		BlockingQueue<ImageFile> imageQueue = new LinkedBlockingQueue<ImageFile>(
 				100);
 		BlockingQueue<Feature> featureQueue = new LinkedBlockingQueue<Feature>(
 				1000);
-		SVMDescriptor hog = new HogSVMDescriptor(50, 1);
+		SVMDescriptor hog = new HogSVMDescriptor(25, 1);
 		Semaphore outputLock = new Semaphore(0);
 
-		int cpuCount = 4;
+		int cpuCount = 3;
 		OutputThread outputThread = new OutputThread(featureQueue, outputLock);
 		outputThread.start();
 
@@ -36,17 +37,18 @@ public class NegativeSetGenerator {
 			threadPool[i].start();
 		}
 
-		int counter = 0;
-		File dir = new File("res/image/svm/negative");
+		File dir = new File(
+				"/home/harper/Research/webpage-comparison/imageset_test");
 		for (File file : dir.listFiles()) {
 			try {
-				imageQueue.put(ImageIO.read(file));
-				counter++;
+				imageQueue
+						.put(new ImageFile(ImageIO.read(file), file.getName()));
 			} catch (Exception e) {
+				System.err.println(file.getName());
 				e.printStackTrace();
 			}
 		}
-		outputLock.acquire(counter);
+		outputLock.acquire(imageQueue.size());
 		for (int i = 0; i < cpuCount; i++) {
 			threadPool[i].setExit(true);
 		}
@@ -54,12 +56,12 @@ public class NegativeSetGenerator {
 	}
 
 	protected static class ProcessThread extends Thread {
-		private BlockingQueue<BufferedImage> imageQueue;
+		private BlockingQueue<ImageFile> imageQueue;
 		private BlockingQueue<Feature> featureQueue;
 		private SVMDescriptor desc;
 		private boolean exit = false;
 
-		public ProcessThread(BlockingQueue<BufferedImage> imageQueue,
+		public ProcessThread(BlockingQueue<ImageFile> imageQueue,
 				BlockingQueue<Feature> featureQueue, SVMDescriptor desc) {
 			super();
 			setDaemon(true);
@@ -76,14 +78,21 @@ public class NegativeSetGenerator {
 		public void run() {
 			while (!exit) {
 				try {
-					BufferedImage image = imageQueue.poll(1, TimeUnit.SECONDS);
-					if (image == null) {
+					ImageFile imageFile = imageQueue.poll(1, TimeUnit.SECONDS);
+					if (imageFile == null) {
 						continue;
 					} else {
-						featureQueue.put(desc
-								.describe(new ImageAccessor(image)));
+						try {
+							BufferedImage transformed = ImageTransformer.scale(
+									imageFile.image, 500, 500);
+							featureQueue.put(desc.describe(new ImageAccessor(
+									transformed)));
+						} catch (Exception e) {
+							System.err.println("Error with " + imageFile.name);
+							e.printStackTrace();
+						}
 					}
-				} catch (InterruptedException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -111,7 +120,8 @@ public class NegativeSetGenerator {
 		public void run() {
 			PrintWriter pw = null;
 			try {
-				pw = new PrintWriter(new FileOutputStream("negative"));
+				pw = new PrintWriter(new FileOutputStream(
+						"res/svm/perf/image_acc/test"));
 				while (!exit) {
 					Feature feature;
 					try {
@@ -129,6 +139,16 @@ public class NegativeSetGenerator {
 			} finally {
 				pw.close();
 			}
+		}
+	}
+
+	public static final class ImageFile {
+		public BufferedImage image;
+		public String name;
+
+		public ImageFile(BufferedImage image, String name) {
+			this.image = image;
+			this.name = name;
 		}
 	}
 }

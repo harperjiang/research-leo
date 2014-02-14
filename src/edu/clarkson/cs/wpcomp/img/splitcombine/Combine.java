@@ -15,11 +15,20 @@ public class Combine {
 
 	private int threshold = 10;
 
-	public List<Rectangle> combine(List<Rectangle> rects) {
+	private Map<Rectangle, Integer> number;
 
-		Map<Rectangle, Integer> number = new HashMap<Rectangle, Integer>();
+	private Map<Integer, List<Rectangle>> region;
+
+	public List<Rectangle> combine(List<Rectangle> rects) {
+		number = new HashMap<Rectangle, Integer>();
+		region = new HashMap<Integer, List<Rectangle>>();
+
 		for (Rectangle rect : rects) {
-			number.put(rect, number.size());
+			int num = number.size();
+			number.put(rect, num);
+			List<Rectangle> list = new ArrayList<Rectangle>();
+			list.add(rect);
+			region.put(num, list);
 		}
 
 		for (int i = 0; i < rects.size(); i++) {
@@ -31,17 +40,13 @@ public class Combine {
 						&& cover.height <= first.height + second.height
 								+ threshold) {
 					// top bottom
-					int min = Math.min(number.get(first), number.get(second));
-					number.put(first, min);
-					number.put(second, min);
+					merge(first, second);
 				} else if (cover.height <= Math
 						.max(first.height, second.height)
 						&& cover.width <= first.width + second.width
 								+ threshold) {
 					// left right
-					int min = Math.min(number.get(first), number.get(second));
-					number.put(first, min);
-					number.put(second, min);
+					merge(first, second);
 				}
 			}
 		}
@@ -61,7 +66,21 @@ public class Combine {
 			set.toArray(array);
 			result.add(GeometryHelper.cover(array));
 		}
-		
+
 		return result;
+	}
+
+	private void merge(Rectangle a, Rectangle b) {
+		int numa = number.get(a);
+		int numb = number.get(b);
+		if (numa == numb)
+			return;
+		int min = Math.min(numa, numb);
+		int max = Math.max(numa, numb);
+
+		for (Rectangle r : region.get(max)) {
+			number.put(r, min);
+		}
+		region.get(min).addAll(region.remove(max));
 	}
 }
