@@ -6,11 +6,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import com.telmomenezes.jfastemd.JFastEMD;
-import com.telmomenezes.jfastemd.Signature;
-
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
-import edu.clarkson.cs.wpcomp.img.desc.descriptor.GradientEMDDescriptor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
@@ -58,27 +54,5 @@ public class ImageDescMain {
 		// ImageIO.write(GradientHelper.gradientImage(google), "png", new File(
 		// "res/output/google.png"));
 
-		GradientEMDDescriptor gradesc = new GradientEMDDescriptor(10, 5);
-
-		System.out.println(System.currentTimeMillis());
-		Signature ebay1sig = gradesc.describe(new ImageAccessor(ebay1));
-		Signature ebay1_trans_sig = gradesc.describe(new ImageAccessor(
-				ebay1_trans));
-		Signature ebay2sig = gradesc.describe(new ImageAccessor(ebay2));
-		Signature ebay3sig = gradesc.describe(new ImageAccessor(ebay3));
-		Signature googlesig = gradesc.describe(new ImageAccessor(google));
-		System.out.println(System.currentTimeMillis());
-
-		System.out.println(JFastEMD.distance(ebay1sig, ebay1_trans_sig, 1));
-		System.out.println(System.currentTimeMillis());
-
-		System.out.println(JFastEMD.distance(ebay1sig, ebay2sig, 1));
-		System.out.println(System.currentTimeMillis());
-
-		System.out.println(JFastEMD.distance(ebay1sig, ebay3sig, 1));
-		System.out.println(System.currentTimeMillis());
-
-		System.out.println(JFastEMD.distance(ebay1sig, googlesig, 1));
-		System.out.println(System.currentTimeMillis());
 	}
 }
