@@ -8,7 +8,11 @@ import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 public class LineSplitter extends AbstractSplitter {
 
 	public LineSplitter(ColorAccessor accessor) {
-		super(accessor);
+		super(new SplitCore(accessor));
+	}
+
+	public LineSplitter(SplitCore core) {
+		super(core);
 	}
 
 	public LineSegment centralSplit(Rectangle range) {
@@ -30,8 +34,8 @@ public class LineSplitter extends AbstractSplitter {
 	public LineSegment split(Rectangle range, SplitCondition condition,
 			Boolean preferH) {
 		if (null == range) {
-			range = new Rectangle(0, 0, accessor.getWidth(),
-					accessor.getHeight());
+			range = new Rectangle(0, 0, getAccessor().getWidth(), getAccessor()
+					.getHeight());
 		}
 		condition.setRange(range);
 		LineSegment vs = vsplit(range, condition);
@@ -139,19 +143,19 @@ public class LineSplitter extends AbstractSplitter {
 			if (isHorizontal()) {
 				int top, bottom;
 				for (top = point; top > range.y
-						&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
+						&& core.preprocess[range.x][top].width >= core.preprocess[range.x][point].width; top--)
 					;
 				for (bottom = point; bottom < range.y + range.height - 1
-						&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
+						&& core.preprocess[range.x][bottom].width >= core.preprocess[range.x][point].width; bottom++)
 					;
 				return new int[] { top, bottom };
 			} else {
 				int left, right;
 				for (left = point; left > range.x
-						&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
+						&& core.preprocess[left][range.y].height >= core.preprocess[point][range.y].height; left--)
 					;
 				for (right = point; right < range.x + range.width - 1
-						&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
+						&& core.preprocess[right][range.y].height >= core.preprocess[point][range.y].height; right++)
 					;
 				return new int[] { left, right };
 			}
@@ -162,9 +166,9 @@ public class LineSplitter extends AbstractSplitter {
 		@Override
 		public boolean satisfy(int point) {
 			if (isHorizontal()) {
-				return preprocess[range.x][point].width >= range.width;
+				return core.preprocess[range.x][point].width >= range.width;
 			} else {
-				return preprocess[point][range.y].height >= range.height;
+				return core.preprocess[point][range.y].height >= range.height;
 			}
 		}
 
@@ -195,19 +199,19 @@ public class LineSplitter extends AbstractSplitter {
 			if (isHorizontal()) {
 				int top, bottom;
 				for (top = point; top > 0
-						&& preprocess[range.x][top].width >= preprocess[range.x][point].width; top--)
+						&& core.preprocess[range.x][top].width >= core.preprocess[range.x][point].width; top--)
 					;
 				for (bottom = point; bottom < range.y + range.height - 1
-						&& preprocess[range.x][bottom].width >= preprocess[range.x][point].width; bottom++)
+						&& core.preprocess[range.x][bottom].width >= core.preprocess[range.x][point].width; bottom++)
 					;
 				return (top + bottom) / 2;
 			} else {
 				int left, right;
 				for (left = point; left > 0
-						&& preprocess[left][range.y].height >= preprocess[point][range.y].height; left--)
+						&& core.preprocess[left][range.y].height >= core.preprocess[point][range.y].height; left--)
 					;
 				for (right = point; right < range.x + range.width - 1
-						&& preprocess[right][range.y].height >= preprocess[point][range.y].height; right++)
+						&& core.preprocess[right][range.y].height >= core.preprocess[point][range.y].height; right++)
 					;
 				return (left + right) / 2;
 			}
@@ -219,9 +223,9 @@ public class LineSplitter extends AbstractSplitter {
 		@Override
 		public boolean satisfy(int point) {
 			if (isHorizontal()) {
-				return preprocess[range.x][point].width >= range.width;
+				return core.preprocess[range.x][point].width >= range.width;
 			} else {
-				return preprocess[point][range.y].height >= range.height;
+				return core.preprocess[point][range.y].height >= range.height;
 			}
 		}
 
@@ -255,9 +259,9 @@ public class LineSplitter extends AbstractSplitter {
 			if (firstPoint != -1) {
 				boolean satisfy = false;
 				if (isHorizontal()) {
-					satisfy = preprocess[range.x][point].width >= range.width;
+					satisfy = core.preprocess[range.x][point].width >= range.width;
 				} else {
-					satisfy = preprocess[point][range.y].height >= range.height;
+					satisfy = core.preprocess[point][range.y].height >= range.height;
 				}
 				firstPoint = point;
 				return satisfy;

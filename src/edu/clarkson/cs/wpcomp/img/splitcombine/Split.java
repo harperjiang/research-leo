@@ -29,11 +29,17 @@ public class Split {
 	}
 
 	public List<Rectangle> split(BufferedImage input) throws IOException {
+		System.out.println("Gradienting Image:" + System.currentTimeMillis());
 		BufferedImage gradient = GradientHelper.gradientImage(input, 20);
 		ColorAccessor accessor = new ImageAccessor(gradient);
+		System.out.println("Generating Split Core:"
+				+ System.currentTimeMillis());
+		SplitCore core = new SplitCore(accessor);
 
-		rect = new RectangleSplitter(accessor);
-		line = new LineSplitter(accessor);
+		System.out.println("Prepare Split Environment:"
+				+ System.currentTimeMillis());
+		rect = new RectangleSplitter(core);
+		line = new LineSplitter(core);
 
 		cenv = new SplitEnv();
 		cenv.lineSplitter = line;
@@ -46,6 +52,7 @@ public class Split {
 		source.add(new Rectangle(0, 0, accessor.getWidth(), accessor
 				.getHeight()));
 
+		System.out.println("Start Split Loop:" + System.currentTimeMillis());
 		while (!source.isEmpty()) {
 			for (Rectangle r : source) {
 				Rectangle fence = rect.lowerBound(r);
@@ -112,6 +119,8 @@ public class Split {
 			result = new ArrayList<Rectangle>();
 		}
 
+		System.out
+				.println("Finishing Split Loop:" + System.currentTimeMillis());
 		source.addAll(mature);
 		return source;
 	}

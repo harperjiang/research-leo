@@ -1,7 +1,7 @@
 var page = require('webpage').create();
 page.viewportSize = {
-	width : 1024,
-	height : 768
+	width : 1920,
+	height : 1080
 };
 var system = require('system');
 var url = system.args[1];

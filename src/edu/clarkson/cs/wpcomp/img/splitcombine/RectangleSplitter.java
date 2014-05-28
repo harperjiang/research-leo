@@ -1,6 +1,5 @@
 package edu.clarkson.cs.wpcomp.img.splitcombine;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
@@ -9,19 +8,23 @@ import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 public class RectangleSplitter extends AbstractSplitter {
 
 	public RectangleSplitter(ColorAccessor accessor) {
-		super(accessor);
+		super(new SplitCore(accessor));
+	}
+
+	public RectangleSplitter(SplitCore core) {
+		super(core);
 	}
 
 	public Rectangle maxSplit(Rectangle range) {
 		if (null == range) {
-			range = new Rectangle(0, 0, accessor.getWidth(),
-					accessor.getHeight());
+			range = new Rectangle(0, 0, getAccessor().getWidth(), getAccessor()
+					.getHeight());
 		}
 		long area = 0;
 		Rectangle max = null;
 		for (int i = range.x; i < range.x + range.width; i++) {
 			for (int j = range.y; j < range.y + range.height; j++) {
-				Dimension topLeft = new Dimension(preprocess[i][j]);
+				Dimension topLeft = new Dimension(core.preprocess[i][j]);
 
 				// Take bound into consideration
 				topLeft.width = Math.min(topLeft.width, range.x + range.width
@@ -38,8 +41,8 @@ public class RectangleSplitter extends AbstractSplitter {
 							h = 0;
 							continue;
 						}
-						Dimension topRight = preprocess[i + w][j];
-						Dimension bottomLeft = preprocess[i][j + h];
+						Dimension topRight = core.preprocess[i + w][j];
+						Dimension bottomLeft = core.preprocess[i][j + h];
 						if (topRight.height >= topLeft.height
 								&& bottomLeft.width >= topLeft.width) {
 							// Rectangle
@@ -64,15 +67,15 @@ public class RectangleSplitter extends AbstractSplitter {
 
 	public Rectangle centralSplit(Rectangle range) {
 		if (null == range) {
-			range = new Rectangle(0, 0, accessor.getWidth(),
-					accessor.getHeight());
+			range = new Rectangle(0, 0, getAccessor().getWidth(), getAccessor()
+					.getHeight());
 		}
 		long center = (range.width * range.height) / 2;
 		long area = center;
 		Rectangle max = new Rectangle();
 		for (int i = range.x; i < range.x + range.width; i++) {
 			for (int j = range.y; j < range.y + range.height; j++) {
-				Dimension topLeft = new Dimension(preprocess[i][j]);
+				Dimension topLeft = new Dimension(core.preprocess[i][j]);
 				// Take bound into consideration
 				topLeft.width = Math.min(topLeft.width, range.x + range.width
 						- i);
@@ -89,8 +92,8 @@ public class RectangleSplitter extends AbstractSplitter {
 							}
 							continue;
 						}
-						Dimension topRight = preprocess[i + w][j];
-						Dimension bottomLeft = preprocess[i][j + h];
+						Dimension topRight = core.preprocess[i + w][j];
+						Dimension bottomLeft = core.preprocess[i][j + h];
 						if (topRight.height >= topLeft.height
 								&& bottomLeft.width >= topLeft.width) {
 							// Rectangle
@@ -118,20 +121,21 @@ public class RectangleSplitter extends AbstractSplitter {
 
 	public Rectangle lowerBound(Rectangle range) {
 		if (null == range) {
-			range = new Rectangle(0, 0, accessor.getWidth(),
-					accessor.getHeight());
+			range = new Rectangle(0, 0, getAccessor().getWidth(), getAccessor()
+					.getHeight());
 		}
 		Rectangle lowerbound = new Rectangle(range);
 		Dimension bound = range.getSize();
 
-		Dimension lefttop = preprocess[range.x][range.y];
-		Dimension righttop = preprocess[range.x + range.width - 1][range.y];
-		Dimension leftbottom = preprocess[range.x][range.y + range.height - 1];
+		Dimension lefttop = core.preprocess[range.x][range.y];
+		Dimension righttop = core.preprocess[range.x + range.width - 1][range.y];
+		Dimension leftbottom = core.preprocess[range.x][range.y + range.height
+				- 1];
 
 		int i = 0;
 		if (lefttop.height >= bound.height) {
 			for (i = 0; i < range.width; i++) {
-				if (preprocess[range.x + i][range.y].height < bound.height)
+				if (core.preprocess[range.x + i][range.y].height < bound.height)
 					break;
 			}
 			if (i == range.width) {
@@ -143,14 +147,14 @@ public class RectangleSplitter extends AbstractSplitter {
 		}
 		if (righttop.height >= bound.height) {
 			for (i = range.width - 1; i > 0; i--) {
-				if (preprocess[range.x + i][range.y].height < bound.height)
+				if (core.preprocess[range.x + i][range.y].height < bound.height)
 					break;
 			}
 			lowerbound.width -= range.width - 2 - i;
 		}
 		if (lefttop.width >= bound.width) {
 			for (i = 0; i < range.height; i++) {
-				if (preprocess[range.x][range.y + i].width < bound.width)
+				if (core.preprocess[range.x][range.y + i].width < bound.width)
 					break;
 			}
 			if (i == range.height)
@@ -160,7 +164,7 @@ public class RectangleSplitter extends AbstractSplitter {
 		}
 		if (leftbottom.width >= bound.width) {
 			for (i = 0; i < range.height; i++) {
-				if (preprocess[range.x][range.y + range.height - 1 - i].width < bound.width) {
+				if (core.preprocess[range.x][range.y + range.height - 1 - i].width < bound.width) {
 					break;
 				}
 			}
