@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.retrieve;
+package edu.clarkson.cs.wpcomp.tools;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -6,9 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import edu.clarkson.cs.wpcomp.html.phantomjs.PJExecutor;
+import edu.clarkson.cs.wpcomp.common.phantomjs.PJExecutor;
 
-public class ImageUrlRetriver {
+public class FlickerImageRetrieve {
 
 	public static void main(String[] args) throws ParseException {
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd");

@@ -1,10 +1,12 @@
-package edu.clarkson.cs.wpcomp.html.phantomjs;
+package edu.clarkson.cs.wpcomp.common.phantomjs;
 
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
 import org.junit.Test;
+
+import edu.clarkson.cs.wpcomp.common.phantomjs.PJExecutor;
 
 public class PJExecutorTest {
 

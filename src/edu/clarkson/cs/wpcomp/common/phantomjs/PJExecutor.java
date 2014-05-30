@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.html.phantomjs;
+package edu.clarkson.cs.wpcomp.common.phantomjs;
 
 import java.io.BufferedReader;
 import java.io.File;

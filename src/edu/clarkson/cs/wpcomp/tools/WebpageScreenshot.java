@@ -1,10 +1,8 @@
-package edu.clarkson.cs.wpcomp.perf.overall;
+package edu.clarkson.cs.wpcomp.tools;
 
-import java.text.DecimalFormat;
+import edu.clarkson.cs.wpcomp.common.phantomjs.PJExecutor;
 
-import edu.clarkson.cs.wpcomp.html.phantomjs.PJExecutor;
-
-public class CollectImage {
+public class WebpageScreenshot {
 
 	public static void main(String[] args) throws Exception {
 		PJExecutor executor = new PJExecutor();
