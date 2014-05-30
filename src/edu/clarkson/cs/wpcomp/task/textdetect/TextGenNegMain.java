@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.textdetect;
+package edu.clarkson.cs.wpcomp.task.textdetect;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Feature;
+import edu.clarkson.cs.wpcomp.img.textdetect.TextImageDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
 public class TextGenNegMain {

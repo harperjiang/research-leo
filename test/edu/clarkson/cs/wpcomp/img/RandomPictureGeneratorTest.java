@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
+import edu.clarkson.cs.wpcomp.tools.RandomPictureGenerator;
+
 public class RandomPictureGeneratorTest {
 
 	@Test

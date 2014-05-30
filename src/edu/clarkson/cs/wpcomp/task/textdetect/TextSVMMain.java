@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.textdetect;
+package edu.clarkson.cs.wpcomp.task.textdetect;
 
 import java.io.File;
 

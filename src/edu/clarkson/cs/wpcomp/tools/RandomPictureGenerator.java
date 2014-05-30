@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img;
+package edu.clarkson.cs.wpcomp.tools;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,5 +20,4 @@ public class RandomPictureGenerator {
 		}
 		return image;
 	}
-
 }

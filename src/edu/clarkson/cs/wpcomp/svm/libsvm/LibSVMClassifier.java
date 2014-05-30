@@ -46,8 +46,7 @@ public class LibSVMClassifier implements Classifier {
 		try {
 			runner.runAndWait();
 		} catch (Exception e) {
-			LoggerFactory.getLogger(getClass()).error(
-					"Exception while executing predict", e);
+			logger.error("Exception while executing predict", e);
 			throw new RuntimeException(e);
 		}
 

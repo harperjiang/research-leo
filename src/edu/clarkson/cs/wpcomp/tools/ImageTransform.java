@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.transform;
+package edu.clarkson.cs.wpcomp.tools;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -6,7 +6,9 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-public class ImageTransformMain {
+import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
+
+public class ImageTransform {
 
 	public static void main(String[] args) throws Exception {
 		// Read image

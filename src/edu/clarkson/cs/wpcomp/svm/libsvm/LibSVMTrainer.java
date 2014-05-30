@@ -33,14 +33,13 @@ public class LibSVMTrainer implements Trainer {
 			@Override
 			public void output(String input) {
 				// TODO If there's error message,throw an exception
-				
+
 			}
 		});
 		try {
 			runner.runAndWait();
 		} catch (Exception e) {
-			LoggerFactory.getLogger(getClass()).error(
-					"Exception when executing external trainer", e);
+			logger.error("Exception when executing external trainer", e);
 			throw new RuntimeException(e);
 		}
 		return new FileModel(new File(trainset.getFile().getAbsolutePath()
