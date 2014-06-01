@@ -21,7 +21,7 @@ import edu.clarkson.cs.wpcomp.img.desc.Feature;
 import edu.clarkson.cs.wpcomp.img.textdetect.TextImageDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
-public class TextGenNegMain {
+public class GenNegativeSetForText {
 
 	public static void main(String[] args) throws Exception {
 

@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.task.imgdesc;
+package edu.clarkson.cs.wpcomp.task;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -19,7 +19,7 @@ import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.splitcombine.RectangleSplitter;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
-public class PositiveSetGenerator {
+public class GenPositiveSet {
 
 	public static void main(String[] args) throws Exception {
 		generate(new File("res/image/svm/positive/logo.jpg"), new File(
@@ -53,20 +53,19 @@ public class PositiveSetGenerator {
 			throws Exception {
 		PrintWriter pw = new PrintWriter(new FileOutputStream(outputFeature));
 		for (Input inputImage : inputImages) {
-			BufferedImage image = ImageIO.read(inputImage.file);
+			BufferedImage image = inputImage.getImage();
 			BufferedImage gradient = GradientHelper.gradientImage(image, 30);
 			ColorAccessor accessor = new ImageAccessor(gradient);
 			RectangleSplitter splitter = new RectangleSplitter(accessor);
 			Rectangle range = splitter.lowerBound(null);
-			if (range == null) {
-				System.out.println(inputImage.file.getName());
-			}
+			
 			BufferedImage cropped = CropHelper.crop(image, range);
 
 			HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
 
 			for (int size = 1500; size > 100; size -= 5) {
-				BufferedImage scale = ImageTransformer.scale(cropped, size, size);
+				BufferedImage scale = ImageTransformer.scale(cropped, size,
+						size);
 				scale = ImageTransformer.scale(scale, 500, 500);
 				Feature feature = hog.describe(new ImageAccessor(scale));
 				pw.println(MessageFormat.format("{0} {1}", 1, feature));
@@ -75,13 +74,4 @@ public class PositiveSetGenerator {
 		pw.close();
 	}
 
-	public static final class Input {
-		public File file;
-		public int value;
-
-		public Input(File file, int value) {
-			this.file = file;
-			this.value = value;
-		}
-	}
 }

@@ -9,8 +9,9 @@ import edu.clarkson.cs.wpcomp.svm.FileDataSet;
 import edu.clarkson.cs.wpcomp.svm.Model;
 import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMClassifier;
 import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMTrainer;
-import edu.clarkson.cs.wpcomp.task.imgdesc.PositiveSetGenerator;
-import edu.clarkson.cs.wpcomp.task.imgdesc.PositiveSetGenerator.Input;
+import edu.clarkson.cs.wpcomp.task.GenPositiveSet;
+import edu.clarkson.cs.wpcomp.task.Input;
+import edu.clarkson.cs.wpcomp.task.Input.FileInput;
 
 public class ImageRecognization {
 
@@ -25,7 +26,7 @@ public class ImageRecognization {
 
 		new ProcessBuilder("cp", "res/svm/img/negative", "workdir").start()
 				.waitFor();
-		PositiveSetGenerator.generate(origin, new File("workdir/positive"));
+		GenPositiveSet.generate(origin, new File("workdir/positive"));
 
 		ProcessBuilder pb = new ProcessBuilder("cat", "workdir/negative",
 				"workdir/positive");
@@ -39,12 +40,12 @@ public class ImageRecognization {
 		while (toTest.size() < 500) {
 			File f = files[random.nextInt(files.length)];
 			if (!f.equals(origin)) {
-				toTest.add(new Input(f, 0));
+				toTest.add(new FileInput(f, 0));
 			}
 		}
-		toTest.add(new Input(origin, 1));
+		toTest.add(new FileInput(origin, 1));
 
-		PositiveSetGenerator.generate(toTest, new File("workdir/test"));
+		GenPositiveSet.generate(toTest, new File("workdir/test"));
 
 		new LibSVMClassifier().classify(model, new FileDataSet(new File(
 				"workdir/test")));

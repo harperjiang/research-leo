@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.task.imgdesc;
+package edu.clarkson.cs.wpcomp.task;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,7 +19,7 @@ import edu.clarkson.cs.wpcomp.img.desc.SVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 
-public class NegativeSetGenerator {
+public class GenNegativeImgSet {
 
 	public static void main(String[] args) throws Exception {
 		BlockingQueue<ImageFile> imageQueue = new LinkedBlockingQueue<ImageFile>(
@@ -29,7 +29,7 @@ public class NegativeSetGenerator {
 		SVMDescriptor hog = new HogSVMDescriptor(25, 1);
 		Semaphore outputLock = new Semaphore(0);
 
-		int cpuCount = 3;
+		int cpuCount = 4;
 		OutputThread outputThread = new OutputThread(featureQueue, outputLock);
 		outputThread.start();
 
@@ -40,7 +40,7 @@ public class NegativeSetGenerator {
 		}
 
 		File dir = new File(
-				"/home/harper/Research/webpage-comparison/imageset_test");
+				"/home/harper/ResearchData/webpage-comparison/imageset_test");
 		for (File file : dir.listFiles()) {
 			try {
 				imageQueue
@@ -123,7 +123,7 @@ public class NegativeSetGenerator {
 			PrintWriter pw = null;
 			try {
 				pw = new PrintWriter(new FileOutputStream(
-						"res/svm/perf/image_acc/test"));
+						"workdir/model/imageset_test"));
 				while (!exit) {
 					Feature feature;
 					try {

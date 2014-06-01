@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.splitcombine;
+package edu.clarkson.cs.wpcomp.task;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -12,24 +12,26 @@ import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.MarkHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.splitcombine.Combine;
+import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
 
-public class SplitCombineMain {
+public class SplitAndCombine {
 
 	public static void main(String[] args) throws Exception {
 		BufferedImage input = ImageIO.read(new File(
 				"res/image/split/phishing.png"));
-//		MultiThreadSplit split = new MultiThreadSplit();
-		 Split split = new Split();
+		SplitAndCombine.work(input);
+	}
+
+	public static void work(BufferedImage input) throws Exception {
+		Split split = new Split();
 		Combine combine = new Combine();
-		
-		long start = System.currentTimeMillis();
+
 		List<Rectangle> ranges = split.split(input);
-		System.out.println(System.currentTimeMillis()-start);
-		
+
 		ColorAccessor accessor = new ImageAccessor(input);
 		BufferedImage gradient = GradientHelper.gradientImage(input, 20);
-		ImageIO.write(gradient, "png", new File(
-				"res/image/split/phishing_gradient.png"));
+		
 		ColorAccessor ga = new ImageAccessor(gradient);
 
 		List<Rectangle> combined = combine.combine(ranges);

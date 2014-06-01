@@ -3,32 +3,35 @@ package edu.clarkson.cs.wpcomp.img.transform;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 
 public class ImageTransformer {
 
+	private static BufferedImage adjust(BufferedImage input) {
+		if (input.getSampleModel() instanceof PixelInterleavedSampleModel) {
+			// Copy this image to a new buffer
+			BufferedImage copy = new BufferedImage(input.getWidth(),
+					input.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			copy.createGraphics().drawImage(input, 0, 0, null);
+			return copy;
+		}
+		return input;
+	}
+
 	public static BufferedImage transform(BufferedImage input,
 			AffineTransform xform) {
-		// BufferedImage copy = null;
-		// if (input.getSampleModel().getNumBands() == 3) {
-		// copy = new BufferedImage(input.getWidth(), input.getHeight(),
-		// BufferedImage.TYPE_INT_RGB);
-		// } else if (input.getType() == BufferedImage.TYPE_INT_ARGB
-		// || input.getType() == BufferedImage.TYPE_INT_RGB
-		// || input.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-		// copy = new BufferedImage(input.getWidth(), input.getHeight(),
-		// input.getType());
-		// } else {
-		// throw new RuntimeException("Unrecognized Type:" + input.getType());
-		// }
-		// copy.setData(input.getData());
+		// Java bug http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4723021
+		// If PixelInterleavedSampleModel is used, create a new BufferedImage
+		// and copy data into it
+		BufferedImage adjusted = adjust(input);
 		AffineTransformOp op = new AffineTransformOp(xform,
 				AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
-		Raster output = op.filter(input.getData(), null);
+		Raster output = op.filter(adjusted.getData(), null);
 
 		BufferedImage oimage = new BufferedImage(output.getWidth(),
-				output.getHeight(), input.getType());
+				output.getHeight(), adjusted.getType());
 		oimage.setData(output);
 		return oimage;
 	}

@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.splitcombine;
+package edu.clarkson.cs.wpcomp.task;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 import edu.clarkson.cs.wpcomp.img.FeatureHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 
-public class EntropyMain {
+public class CalculateEntropy {
 
 	public static void main(String[] args) throws IOException {
 		BufferedImage image1 = ImageIO.read(new File(

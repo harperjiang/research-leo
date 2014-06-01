@@ -4,40 +4,56 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import edu.clarkson.cs.wpcomp.img.CropHelper;
-import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
-import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.splitcombine.Combine;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
+import edu.clarkson.cs.wpcomp.svm.Classifier;
+import edu.clarkson.cs.wpcomp.svm.FileDataSet;
+import edu.clarkson.cs.wpcomp.svm.FileModel;
+import edu.clarkson.cs.wpcomp.svm.Model;
+import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMClassifier;
+import edu.clarkson.cs.wpcomp.task.GenTestSet;
+import edu.clarkson.cs.wpcomp.task.Input;
+import edu.clarkson.cs.wpcomp.task.Input.ImageInput;
 
 public class PhishMain {
 
-	public static void main(String[] args) throws IOException {
-//		PJExecutor exec = new PJExecutor();
-//		exec.setCurrentDir(new File("workdir"));
-//		exec.execute("screenshot",
-//				"http://djyhdjhjdhjdhdjdhjhjhj.bugs3.com/Ymail.html",
-//				"phishing.png");
+	/**
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws Exception {
+		File workdir = new File("workdir");
 
-		BufferedImage input = ImageIO.read(new File("workdir/phishing.png"));
+		BufferedImage input = ImageIO.read(new File(
+				"res/image/split/phishing.png"));
+
 		Split split = new Split();
-		List<Rectangle> ranges = split.split(input);
+		Combine combine = new Combine();
 
-		ColorAccessor accessor = new ImageAccessor(input);
-		int i = 0;
-		for (Rectangle rect : ranges) {
-//			MarkHelper.redrect(rect, accessor);
-			if (rect.width * rect.height >= 400) {
-				String name = MessageFormat.format("range{0}.png", i++);
-				BufferedImage crop = CropHelper.crop(input, rect);
-				ImageIO.write(crop, "png", new File("workdir/" + name));
-			}
+		List<Rectangle> ranges = split.split(input);
+		List<Rectangle> combined = combine.combine(ranges);
+
+		Classifier classifier = new LibSVMClassifier();
+		Model model = new FileModel(new File("workdir/model/logo_train.model"));
+
+		List<Input> inputImages = new ArrayList<Input>();
+		File test = new File(workdir.getAbsolutePath() + File.separator
+				+ "test");
+		for (Rectangle rect : combined) {
+			BufferedImage part = CropHelper.crop(input, rect);
+			inputImages.add(new ImageInput(part, 0));
 		}
-		ImageIO.write(input, "png", new File("workdir/phishingmark.png"));
+
+		GenTestSet.generate(inputImages, test);
+
+		classifier.classify(model, new FileDataSet(test));
 	}
 
 }
