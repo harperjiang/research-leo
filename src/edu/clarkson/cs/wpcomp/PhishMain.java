@@ -13,6 +13,8 @@ import edu.clarkson.cs.wpcomp.img.CropHelper;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Combine;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
 import edu.clarkson.cs.wpcomp.svm.Classifier;
+import edu.clarkson.cs.wpcomp.svm.DataSet;
+import edu.clarkson.cs.wpcomp.svm.DataSet.Row;
 import edu.clarkson.cs.wpcomp.svm.FileDataSet;
 import edu.clarkson.cs.wpcomp.svm.FileModel;
 import edu.clarkson.cs.wpcomp.svm.Model;
@@ -53,7 +55,12 @@ public class PhishMain {
 
 		GenTestSet.generate(inputImages, test);
 
-		classifier.classify(model, new FileDataSet(test));
+		DataSet output = classifier.classify(model, new FileDataSet(test));
+		for(Row row: output) {
+			if(Integer.valueOf(String.valueOf(row.get(0))) != 0) {
+				System.err.println("Phishing Match found!");
+			}
+		}
 	}
 
 }
