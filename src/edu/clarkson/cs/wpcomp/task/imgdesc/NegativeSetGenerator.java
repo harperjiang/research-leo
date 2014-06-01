@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc;
+package edu.clarkson.cs.wpcomp.task.imgdesc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.desc.Feature;
+import edu.clarkson.cs.wpcomp.img.desc.SVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 

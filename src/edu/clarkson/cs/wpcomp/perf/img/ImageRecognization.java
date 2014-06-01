@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import edu.clarkson.cs.wpcomp.img.desc.PositiveSetGenerator;
-import edu.clarkson.cs.wpcomp.img.desc.PositiveSetGenerator.Input;
 import edu.clarkson.cs.wpcomp.svm.FileDataSet;
 import edu.clarkson.cs.wpcomp.svm.Model;
 import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMClassifier;
 import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMTrainer;
+import edu.clarkson.cs.wpcomp.task.imgdesc.PositiveSetGenerator;
+import edu.clarkson.cs.wpcomp.task.imgdesc.PositiveSetGenerator.Input;
 
 public class ImageRecognization {
 

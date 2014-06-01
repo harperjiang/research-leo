@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc;
+package edu.clarkson.cs.wpcomp.task.imgdesc;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -7,6 +7,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.desc.Feature;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 

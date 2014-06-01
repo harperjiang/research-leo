@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc;
+package edu.clarkson.cs.wpcomp.task.imgdesc;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -14,6 +14,7 @@ import edu.clarkson.cs.wpcomp.img.CropHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.desc.Feature;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.splitcombine.RectangleSplitter;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
@@ -64,10 +65,12 @@ public class PositiveSetGenerator {
 
 			HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
 
-			BufferedImage scale = ImageTransformer.scale(cropped, 500, 500);
-			Feature feature = hog.describe(new ImageAccessor(scale));
-			pw.println(MessageFormat.format("{0} {1}", inputImage.value,
-					feature));
+			for (int size = 1500; size > 100; size -= 5) {
+				BufferedImage scale = ImageTransformer.scale(cropped, size, size);
+				scale = ImageTransformer.scale(scale, 500, 500);
+				Feature feature = hog.describe(new ImageAccessor(scale));
+				pw.println(MessageFormat.format("{0} {1}", 1, feature));
+			}
 		}
 		pw.close();
 	}

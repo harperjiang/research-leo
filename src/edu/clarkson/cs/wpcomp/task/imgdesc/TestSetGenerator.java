@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.desc;
+package edu.clarkson.cs.wpcomp.task.imgdesc;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -13,6 +13,7 @@ import edu.clarkson.cs.wpcomp.img.CropHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.desc.Feature;
 import edu.clarkson.cs.wpcomp.img.desc.descriptor.HogSVMDescriptor;
 import edu.clarkson.cs.wpcomp.img.splitcombine.RectangleSplitter;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
