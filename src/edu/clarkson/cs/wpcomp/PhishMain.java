@@ -36,7 +36,6 @@ public class PhishMain {
 				BufferedImage crop = CropHelper.crop(input, rect);
 				ImageIO.write(crop, "png", new File("workdir/" + name));
 			}
-			
 		}
 		ImageIO.write(input, "png", new File("workdir/phishingmark.png"));
 	}
