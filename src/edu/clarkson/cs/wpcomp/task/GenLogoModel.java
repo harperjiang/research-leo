@@ -13,7 +13,7 @@ import edu.clarkson.cs.wpcomp.task.Input.FileInput;
 public class GenLogoModel {
 
 	public static void main(String[] args) throws Exception {
-		File dir = new File("res/image/logo");
+		File dir = new File("res/logo");
 		File[] logos = dir.listFiles();
 
 		List<Input> inputs = new ArrayList<Input>();

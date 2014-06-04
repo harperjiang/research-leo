@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 
 public class Split {
+
+	private int gradientThreshold = 30;
 
 	private List<Filter> filters;
 
@@ -21,6 +26,8 @@ public class Split {
 
 	private SplitEnv cenv;
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
 	public Split() {
 		super();
 		filters = new ArrayList<Filter>();
@@ -29,15 +36,14 @@ public class Split {
 	}
 
 	public List<Rectangle> split(BufferedImage input) throws IOException {
-		System.out.println("Gradienting Image:" + System.currentTimeMillis());
-		BufferedImage gradient = GradientHelper.gradientImage(input, 20);
+		logger.debug("Gradienting Image:" + System.currentTimeMillis());
+		BufferedImage gradient = GradientHelper.gradientImage(input,
+				gradientThreshold);
 		ColorAccessor accessor = new ImageAccessor(gradient);
-		System.out.println("Generating Split Core:"
-				+ System.currentTimeMillis());
+		logger.debug("Generating Split Core:" + System.currentTimeMillis());
 		SplitCore core = new SplitCore(accessor);
 
-		System.out.println("Prepare Split Environment:"
-				+ System.currentTimeMillis());
+		logger.debug("Prepare Split Environment:" + System.currentTimeMillis());
 		rect = new RectangleSplitter(core);
 		line = new LineSplitter(core);
 
@@ -52,8 +58,9 @@ public class Split {
 		source.add(new Rectangle(0, 0, accessor.getWidth(), accessor
 				.getHeight()));
 
-		System.out.println("Start Split Loop:" + System.currentTimeMillis());
-		while (!source.isEmpty()) {
+		logger.debug("Start Split Loop:" + System.currentTimeMillis());
+		// while (!source.isEmpty()) {
+		for (int i = 0; i < 4; i++) {
 			for (Rectangle r : source) {
 				Rectangle fence = rect.lowerBound(r);
 				if (fence == null)
@@ -119,8 +126,7 @@ public class Split {
 			result = new ArrayList<Rectangle>();
 		}
 
-		System.out
-				.println("Finishing Split Loop:" + System.currentTimeMillis());
+		logger.debug("Finishing Split Loop:" + System.currentTimeMillis());
 		source.addAll(mature);
 		return source;
 	}

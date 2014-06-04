@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.collections.CollectionUtils;
 
 import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.FeatureHelper;
 import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Feature;
@@ -39,6 +40,8 @@ public class TextFilter implements Filter {
 	private TextImageDescriptor desc;
 
 	private int heightThreshold = 25;
+
+	private double entropyThreshold = 0.72;
 
 	public TextFilter() {
 		super();
@@ -77,7 +80,7 @@ public class TextFilter implements Filter {
 			// This is an empty range which can be filtered out
 			return false;
 		}
-		
+
 		// Many companies use single word as Logo
 		if (output.size() == 1 && output.get(0).height > heightThreshold) {
 			return true;
@@ -105,7 +108,7 @@ public class TextFilter implements Filter {
 			pw.close();
 
 			DataSet classifyResult = classifier.classify(new FileModel(
-					new File("res/svm/text/train.model")), new FileDataSet(
+					new File("workdir/textdetect/train.model")), new FileDataSet(
 					new File(fileName)));
 
 			FileDataSet fds = (FileDataSet) classifyResult;
@@ -124,7 +127,13 @@ public class TextFilter implements Filter {
 				}
 			}
 			br.close();
-			return (correct != features.size());
+
+			if (correct > features.size() / 2) {
+				// Most of them are successfully recognized
+				return FeatureHelper.entropy(
+						new ImageAccessor(cenv.sourceImage), range) > entropyThreshold;
+			}
+			return true;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

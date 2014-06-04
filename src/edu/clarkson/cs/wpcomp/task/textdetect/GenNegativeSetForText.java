@@ -26,7 +26,7 @@ public class GenNegativeSetForText {
 	public static void main(String[] args) throws Exception {
 
 		File folder = new File(
-				"/home/harper/Research/webpage-comparison/imageset_test");
+				"/home/harper/ResearchData/webpage-comparison/imageset_test");
 
 		BlockingQueue<BufferedImage> inputQueue = new LinkedBlockingQueue<BufferedImage>(
 				100);
@@ -98,7 +98,7 @@ public class GenNegativeSetForText {
 		public void run() {
 			try {
 				PrintWriter pw = new PrintWriter(new FileOutputStream(
-						"res/svm/perf/text_acc/neg_test"));
+						"workdir/textdetect/text_negative"));
 				while (!exit) {
 					Feature feature = output.poll(1, TimeUnit.SECONDS);
 					if (null == feature)

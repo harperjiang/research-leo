@@ -52,13 +52,13 @@ public class GenPositiveSetForText {
 			new Font("Courier", Font.PLAIN, 12) };
 
 	public static void main(String[] args) throws Exception {
-		generateWord();
+//		generateWord();
 		generateFromFile();
 	}
 
 	public static void generateWord() throws Exception {
 		PrintWriter pw = new PrintWriter(new FileOutputStream(
-				"res/svm/perf/text_acc/test_pos_word"));
+				"res/textsample/word"));
 
 		Random random = new Random(System.currentTimeMillis());
 		int dictSize = Dicts.wordList.getDict().size();
@@ -96,9 +96,9 @@ public class GenPositiveSetForText {
 	public static void generateFromFile() throws Exception {
 		Random random = new Random(System.currentTimeMillis());
 		PrintWriter pw = new PrintWriter(new FileOutputStream(
-				"res/svm/perf/text_acc/test_pos_bible"));
+				"workdir/textdetect/text_positive"));
 		BufferedReader br = new BufferedReader(new InputStreamReader(
-				new FileInputStream("res/svm/perf/text_acc/source")));
+				new FileInputStream("res/textdetect/input")));
 		String line = null;
 		int count = 0;
 		while ((line = br.readLine()) != null) {
