@@ -3,7 +3,7 @@ package edu.clarkson.cs.wpcomp.img;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-public class CropHelper {
+public class ImageHelper {
 
 	public static BufferedImage crop(BufferedImage image, Rectangle range) {
 		BufferedImage cropedImage = new BufferedImage(range.width,
@@ -16,4 +16,5 @@ public class CropHelper {
 		}
 		return cropedImage;
 	}
+
 }

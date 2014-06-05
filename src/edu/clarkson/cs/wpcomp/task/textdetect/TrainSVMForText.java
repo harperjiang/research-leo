@@ -13,9 +13,9 @@ public class TrainSVMForText {
 		LibSVMTrainer trainer = new LibSVMTrainer();
 		LibSVMClassifier classifier = new LibSVMClassifier();
 		Model model = trainer.train(new FileDataSet(new File(
-				"workdir/textdetect/train")));
-		classifier.classify(model, new FileDataSet(
-				new File("workdir/textdetect/test")));
+				"workdir/textdetect/text_train")));
+//		classifier.classify(model, new FileDataSet(
+//				new File("workdir/textdetect/test")));
 	}
 
 }

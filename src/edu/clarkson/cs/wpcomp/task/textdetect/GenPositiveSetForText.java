@@ -18,7 +18,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -134,7 +134,7 @@ public class GenPositiveSetForText {
 		ColorAccessor accessor = new ImageAccessor(gradient);
 		RectangleSplitter splitter = new RectangleSplitter(accessor);
 		Rectangle lower = splitter.lowerBound(null);
-		BufferedImage cropped = CropHelper.crop(gradient, lower);
+		BufferedImage cropped = ImageHelper.crop(gradient, lower);
 		BufferedImage scaled = ImageTransformer.scale(cropped,
 				(int) (50 * (double) cropped.getWidth() / (double) cropped
 						.getHeight()), 50);

@@ -31,7 +31,8 @@ public class Split {
 	public Split() {
 		super();
 		filters = new ArrayList<Filter>();
-		filters.add(new SizeFilter());
+		// filters.add(new SizeFilter());
+		// filters.add(new EntropyFilter());
 		filters.add(new TextFilter());
 	}
 
@@ -59,8 +60,8 @@ public class Split {
 				.getHeight()));
 
 		logger.debug("Start Split Loop:" + System.currentTimeMillis());
-		// while (!source.isEmpty()) {
-		for (int i = 0; i < 4; i++) {
+		while (!source.isEmpty()) {
+			// for (int i = 0; i < 7; i++) {
 			for (Rectangle r : source) {
 				Rectangle fence = rect.lowerBound(r);
 				if (fence == null)
@@ -137,6 +138,10 @@ public class Split {
 				return false;
 		}
 		return true;
+	}
+
+	public SplitEnv getCenv() {
+		return cenv;
 	}
 
 	private int[] searchBoxRange = { 15, 40 };

@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Combine;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
 import edu.clarkson.cs.wpcomp.svm.Classifier;
@@ -49,7 +49,7 @@ public class PhishMain {
 		File test = new File(workdir.getAbsolutePath() + File.separator
 				+ "test");
 		for (Rectangle rect : combined) {
-			BufferedImage part = CropHelper.crop(input, rect);
+			BufferedImage part = ImageHelper.crop(input, rect);
 			inputImages.add(new ImageInput(part, 0));
 		}
 

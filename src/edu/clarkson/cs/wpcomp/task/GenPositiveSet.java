@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -34,7 +34,7 @@ public class GenPositiveSet {
 		ColorAccessor accessor = new ImageAccessor(gradient);
 		RectangleSplitter splitter = new RectangleSplitter(accessor);
 		Rectangle range = splitter.lowerBound(null);
-		BufferedImage croped = CropHelper.crop(image, range);
+		BufferedImage croped = ImageHelper.crop(image, range);
 
 		PrintWriter pw = new PrintWriter(new FileOutputStream(outputFeature));
 
@@ -59,7 +59,7 @@ public class GenPositiveSet {
 			RectangleSplitter splitter = new RectangleSplitter(accessor);
 			Rectangle range = splitter.lowerBound(null);
 			
-			BufferedImage cropped = CropHelper.crop(image, range);
+			BufferedImage cropped = ImageHelper.crop(image, range);
 
 			HogSVMDescriptor hog = new HogSVMDescriptor(50, 1);
 

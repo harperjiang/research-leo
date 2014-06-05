@@ -4,9 +4,9 @@ import java.awt.Rectangle;
 
 public class SizeFilter implements Filter {
 
-	private int widthThreshold = 5;
+	private int widthThreshold = 8;
 
-	private int heightThreshold = 5;
+	private int heightThreshold = 8;
 
 	private int areaThreshold = 100;
 

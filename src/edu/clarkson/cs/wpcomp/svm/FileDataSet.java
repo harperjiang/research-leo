@@ -65,9 +65,11 @@ public class FileDataSet implements DataSet {
 
 			@Override
 			public Row next() {
-				if(StringUtils.isEmpty(nextLine))
+				if (StringUtils.isEmpty(nextLine))
 					return null;
-				return new DefaultRow(nextLine.split("\\s"));
+				Row row = new DefaultRow(nextLine.split("\\s"));
+				nextLine = null;
+				return row;
 			}
 
 		};

@@ -13,61 +13,62 @@ import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 
 public class Combine {
 
-	private int threshold = 10;
+	private double difference = 0.1;
 
 	private Map<Rectangle, Integer> number;
 
 	private Map<Integer, List<Rectangle>> region;
 
 	public List<Rectangle> combine(List<Rectangle> rects) {
-		number = new HashMap<Rectangle, Integer>();
-		region = new HashMap<Integer, List<Rectangle>>();
+		List<Rectangle> targets = new ArrayList<Rectangle>();
+		targets.addAll(rects);
 
-		for (Rectangle rect : rects) {
-			int num = number.size();
-			number.put(rect, num);
-			List<Rectangle> list = new ArrayList<Rectangle>();
-			list.add(rect);
-			region.put(num, list);
-		}
+		while (true) {
+			number = new HashMap<Rectangle, Integer>();
+			region = new HashMap<Integer, List<Rectangle>>();
 
-		for (int i = 0; i < rects.size(); i++) {
-			for (int j = i + 1; j < rects.size(); j++) {
-				Rectangle first = rects.get(i);
-				Rectangle second = rects.get(j);
-				Rectangle cover = GeometryHelper.cover(first, second);
-				if (cover.width <= Math.max(first.width, second.width)
-						&& cover.height <= first.height + second.height
-								+ threshold) {
-					// top bottom
-					merge(first, second);
-				} else if (cover.height <= Math
-						.max(first.height, second.height)
-						&& cover.width <= first.width + second.width
-								+ threshold) {
-					// left right
-					merge(first, second);
+			int oldSize = targets.size();
+
+			for (Rectangle rect : targets) {
+				int num = number.size();
+				number.put(rect, num);
+				List<Rectangle> list = new ArrayList<Rectangle>();
+				list.add(rect);
+				region.put(num, list);
+			}
+
+			for (int i = 0; i < targets.size(); i++) {
+				for (int j = i + 1; j < targets.size(); j++) {
+					Rectangle first = targets.get(i);
+					Rectangle second = targets.get(j);
+					Rectangle cover = GeometryHelper.cover(first, second);
+					if (GeometryHelper.area(cover) <= (1 + difference)
+							* (GeometryHelper.area(first) + GeometryHelper
+									.area(second))) {
+						merge(first, second);
+					}
 				}
 			}
-		}
 
-		Map<Integer, Set<Rectangle>> mapping = new HashMap<Integer, Set<Rectangle>>();
-		for (Entry<Rectangle, Integer> entry : number.entrySet()) {
-			if (!mapping.containsKey(entry.getValue())) {
-				mapping.put(entry.getValue(), new HashSet<Rectangle>());
+			Map<Integer, Set<Rectangle>> mapping = new HashMap<Integer, Set<Rectangle>>();
+			for (Entry<Rectangle, Integer> entry : number.entrySet()) {
+				if (!mapping.containsKey(entry.getValue())) {
+					mapping.put(entry.getValue(), new HashSet<Rectangle>());
+				}
+				mapping.get(entry.getValue()).add(entry.getKey());
 			}
-			mapping.get(entry.getValue()).add(entry.getKey());
+
+			targets.clear();
+
+			for (Set<Rectangle> set : mapping.values()) {
+				Rectangle[] array = new Rectangle[set.size()];
+				set.toArray(array);
+				targets.add(GeometryHelper.cover(array));
+			}
+			if (targets.size() == oldSize) {
+				return targets;
+			}
 		}
-
-		List<Rectangle> result = new ArrayList<Rectangle>();
-
-		for (Set<Rectangle> set : mapping.values()) {
-			Rectangle[] array = new Rectangle[set.size()];
-			set.toArray(array);
-			result.add(GeometryHelper.cover(array));
-		}
-
-		return result;
 	}
 
 	private void merge(Rectangle a, Rectangle b) {

@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.List;
 
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -34,7 +34,7 @@ public class GenTestSet {
 			RectangleSplitter splitter = new RectangleSplitter(accessor);
 			Rectangle range = splitter.lowerBound(null);
 
-			BufferedImage cropped = CropHelper.crop(image, range);
+			BufferedImage cropped = ImageHelper.crop(image, range);
 			BufferedImage scale = ImageTransformer.scale(cropped, 500, 500);
 			Feature feature = hog.describe(new ImageAccessor(scale));
 			pw.println(MessageFormat.format("{0} {1}", 1, feature));

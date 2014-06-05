@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 import edu.clarkson.cs.wpcomp.img.MarkHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Combine;
+import edu.clarkson.cs.wpcomp.img.splitcombine.Filters;
+import edu.clarkson.cs.wpcomp.img.splitcombine.SizeFilter;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
 
 public class PhishingMark {
@@ -23,7 +25,8 @@ public class PhishingMark {
 		Combine combine = new Combine();
 
 		List<Rectangle> ranges = split.split(input);
-		// ranges = combine.combine(ranges);
+		ranges = combine.combine(ranges);
+		ranges = Filters.filter(split.getCenv(), new SizeFilter(), ranges);
 
 		ImageAccessor accessor = new ImageAccessor(input);
 		for (Rectangle com : ranges) {

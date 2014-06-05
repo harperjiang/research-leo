@@ -2,12 +2,9 @@ package edu.clarkson.cs.wpcomp.img.splitcombine;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -18,7 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.FeatureHelper;
 import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
@@ -27,6 +24,7 @@ import edu.clarkson.cs.wpcomp.img.textdetect.TextImageDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 import edu.clarkson.cs.wpcomp.svm.Classifier;
 import edu.clarkson.cs.wpcomp.svm.DataSet;
+import edu.clarkson.cs.wpcomp.svm.DataSet.Row;
 import edu.clarkson.cs.wpcomp.svm.FileDataSet;
 import edu.clarkson.cs.wpcomp.svm.FileModel;
 import edu.clarkson.cs.wpcomp.svm.libsvm.LibSVMClassifier;
@@ -89,7 +87,7 @@ public class TextFilter implements Filter {
 		List<Feature> features = new ArrayList<Feature>();
 
 		for (Rectangle r : output) {
-			BufferedImage cropped = CropHelper.crop(cenv.sourceImage, r);
+			BufferedImage cropped = ImageHelper.crop(cenv.sourceImage, r);
 			BufferedImage scaled = ImageTransformer.scale(cropped,
 					(int) (50 * (double) cropped.getWidth() / (double) cropped
 							.getHeight()), 50);
@@ -108,30 +106,24 @@ public class TextFilter implements Filter {
 			pw.close();
 
 			DataSet classifyResult = classifier.classify(new FileModel(
-					new File("workdir/textdetect/train.model")), new FileDataSet(
-					new File(fileName)));
-
-			FileDataSet fds = (FileDataSet) classifyResult;
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(fds.getFile())));
-			String line = null;
+					new File("workdir/textdetect/text_train.model")),
+					new FileDataSet(new File(fileName)));
 
 			int correct = 0;
 
-			while (null != (line = br.readLine())) {
-				try {
-					if (Integer.parseInt(line) == 1)
-						correct++;
-				} catch (Exception e) {
-
-				}
+			for (Row row : classifyResult) {
+				if (1 == Integer.parseInt(String.valueOf(row.get(0))))
+					correct++;
 			}
-			br.close();
-
+			if (correct == features.size()) {
+				// Fully match, text
+				return false;
+			}
 			if (correct > features.size() / 2) {
-				// Most of them are successfully recognized
-				return FeatureHelper.entropy(
-						new ImageAccessor(cenv.sourceImage), range) > entropyThreshold;
+				// Most of them are text
+				double entropy = FeatureHelper.entropy(new ImageAccessor(
+						cenv.sourceImage), range);
+				return entropy > entropyThreshold;
 			}
 			return true;
 		} catch (IOException e) {
