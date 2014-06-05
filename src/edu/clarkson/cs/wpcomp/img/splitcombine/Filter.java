@@ -4,6 +4,10 @@ import java.awt.Rectangle;
 
 public interface Filter {
 
-	public boolean filter(Rectangle r, SplitEnv env);
+	public static enum FilterResult {
+		CONTINUE, STOP, DISCARD
+	}
+
+	public FilterResult filter(Rectangle r, SplitEnv env);
 
 }

@@ -15,9 +15,9 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.FeatureHelper;
 import edu.clarkson.cs.wpcomp.img.GeometryHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Feature;
 import edu.clarkson.cs.wpcomp.img.textdetect.TextImageDescriptor;
@@ -49,7 +49,7 @@ public class TextFilter implements Filter {
 	}
 
 	@Override
-	public boolean filter(Rectangle range, SplitEnv cenv) {
+	public FilterResult filter(Rectangle range, SplitEnv cenv) {
 		List<Rectangle> source = new ArrayList<Rectangle>();
 		List<Rectangle> result = new ArrayList<Rectangle>();
 		List<Rectangle> output = new ArrayList<Rectangle>();
@@ -76,12 +76,12 @@ public class TextFilter implements Filter {
 		}
 		if (CollectionUtils.isEmpty(output)) {
 			// This is an empty range which can be filtered out
-			return false;
+			return FilterResult.DISCARD;
 		}
 
 		// Many companies use single word as Logo
 		if (output.size() == 1 && output.get(0).height > heightThreshold) {
-			return true;
+			return FilterResult.CONTINUE;
 		}
 
 		List<Feature> features = new ArrayList<Feature>();
@@ -117,15 +117,18 @@ public class TextFilter implements Filter {
 			}
 			if (correct == features.size()) {
 				// Fully match, text
-				return false;
+				return FilterResult.DISCARD;
 			}
 			if (correct > features.size() / 2) {
 				// Most of them are text
 				double entropy = FeatureHelper.entropy(new ImageAccessor(
 						cenv.sourceImage), range);
-				return entropy > entropyThreshold;
+				if (entropy > entropyThreshold)
+					return FilterResult.CONTINUE;
+				else
+					return FilterResult.DISCARD;
 			}
-			return true;
+			return FilterResult.CONTINUE;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

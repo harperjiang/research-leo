@@ -76,14 +76,6 @@ public class MultiThreadSplit {
 		return mature;
 	}
 
-	private boolean filter(Rectangle r) {
-		for (Filter filter : filters) {
-			if (!filter.filter(r, cenv))
-				return false;
-		}
-		return true;
-	}
-
 	private class Task implements Callable<List<Rectangle>> {
 
 		SplitEnv cenv;
@@ -159,10 +151,21 @@ public class MultiThreadSplit {
 		}
 
 		protected void addResult(List<Rectangle> result, Rectangle r) {
-			if (filter(r)) {
-				result.add(r);
+			for (Filter f : filters) {
+				switch (f.filter(r, cenv)) {
+				case CONTINUE:
+					result.add(r);
+					break;
+				case STOP:
+					mature.add(r);
+					break;
+				case DISCARD:
+				default:
+					break;
+				}
 			}
 		}
+
 	}
 
 	private int[] searchBoxRange = { 15, 40 };

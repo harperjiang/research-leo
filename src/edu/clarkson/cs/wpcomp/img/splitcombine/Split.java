@@ -31,7 +31,7 @@ public class Split {
 	public Split() {
 		super();
 		filters = new ArrayList<Filter>();
-		// filters.add(new SizeFilter());
+		filters.add(new SizeFilter());
 		// filters.add(new EntropyFilter());
 		filters.add(new TextFilter());
 	}
@@ -118,11 +118,30 @@ public class Split {
 				// All methods tried, this area is thought to be non-splittable
 				mature.add(fence);
 			}
+
 			source = new ArrayList<Rectangle>();
 			for (Rectangle r : result) {
-				if (filter(r)) {
-					source.add(r);
+				int continueCount = 0;
+				boolean stop = false;
+				for (Filter f : filters) {
+					if (stop)
+						break;
+					switch (f.filter(r, cenv)) {
+					case CONTINUE:
+						continueCount++;
+						break;
+					case STOP:
+						mature.add(r);
+						stop = true;
+						break;
+					case DISCARD:
+					default:
+						stop = true;
+						break;
+					}
 				}
+				if (continueCount == filters.size())
+					source.add(r);
 			}
 			result = new ArrayList<Rectangle>();
 		}
@@ -130,14 +149,6 @@ public class Split {
 		logger.debug("Finishing Split Loop:" + System.currentTimeMillis());
 		source.addAll(mature);
 		return source;
-	}
-
-	private boolean filter(Rectangle r) {
-		for (Filter filter : filters) {
-			if (!filter.filter(r, cenv))
-				return false;
-		}
-		return true;
 	}
 
 	public SplitEnv getCenv() {

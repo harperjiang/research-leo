@@ -10,10 +10,12 @@ public class EntropyFilter implements Filter {
 	private double entropyThreshold = 0.5;
 
 	@Override
-	public boolean filter(Rectangle r, SplitEnv env) {
+	public FilterResult filter(Rectangle r, SplitEnv env) {
 		double entropy = FeatureHelper.entropy(new ImageAccessor(
 				env.sourceImage), r);
-		return entropy > entropyThreshold;
+		if (entropy > entropyThreshold)
+			return FilterResult.CONTINUE;
+		return FilterResult.DISCARD;
 	}
 
 }
