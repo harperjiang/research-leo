@@ -1,6 +1,8 @@
-package edu.clarkson.cs.wpcomp.img.splitcombine;
+package edu.clarkson.cs.wpcomp.img.splitcombine.filter;
 
 import java.awt.Rectangle;
+
+import edu.clarkson.cs.wpcomp.img.splitcombine.SplitEnv;
 
 public class SizeFilter implements Filter {
 
@@ -12,10 +14,13 @@ public class SizeFilter implements Filter {
 
 	@Override
 	public FilterResult filter(Rectangle r, SplitEnv cenv) {
+		FilterResult result = new FilterResult();
 		if (r.width > widthThreshold && r.height > heightThreshold
 				&& r.width * r.height > areaThreshold)
-			return FilterResult.CONTINUE;
-		return FilterResult.STOP;
+			result.getAccepted().add(r);
+		else
+			result.getMatured().add(r);
+		return result;
 	}
 
 }

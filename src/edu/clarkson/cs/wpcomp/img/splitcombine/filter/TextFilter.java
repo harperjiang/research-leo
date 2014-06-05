@@ -1,4 +1,4 @@
-package edu.clarkson.cs.wpcomp.img.splitcombine;
+package edu.clarkson.cs.wpcomp.img.splitcombine.filter;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -15,11 +15,14 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import edu.clarkson.cs.wpcomp.img.FeatureHelper;
 import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.ImageHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.desc.Feature;
+import edu.clarkson.cs.wpcomp.img.splitcombine.LineSegment;
+import edu.clarkson.cs.wpcomp.img.splitcombine.LineSplitter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.RectangleSplitter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.SplitEnv;
 import edu.clarkson.cs.wpcomp.img.textdetect.TextImageDescriptor;
 import edu.clarkson.cs.wpcomp.img.transform.ImageTransformer;
 import edu.clarkson.cs.wpcomp.svm.Classifier;
@@ -39,7 +42,7 @@ public class TextFilter implements Filter {
 
 	private int heightThreshold = 25;
 
-	private double entropyThreshold = 0.72;
+	private double ratioThreshold = 1.33;
 
 	public TextFilter() {
 		super();
@@ -50,6 +53,8 @@ public class TextFilter implements Filter {
 
 	@Override
 	public FilterResult filter(Rectangle range, SplitEnv cenv) {
+		FilterResult fresult = new FilterResult();
+
 		List<Rectangle> source = new ArrayList<Rectangle>();
 		List<Rectangle> result = new ArrayList<Rectangle>();
 		List<Rectangle> output = new ArrayList<Rectangle>();
@@ -76,13 +81,23 @@ public class TextFilter implements Filter {
 		}
 		if (CollectionUtils.isEmpty(output)) {
 			// This is an empty range which can be filtered out
-			return FilterResult.DISCARD;
+			return fresult;
 		}
 
-		// Many companies use single word as Logo
-		if (output.size() == 1 && output.get(0).height > heightThreshold) {
-			return FilterResult.CONTINUE;
+		// Many companies use single word as Logo, thus remove text with big
+		// height or single character like
+		List<Rectangle> buffer = new ArrayList<Rectangle>();
+		for (Rectangle rect : output) {
+			if (rect.height > heightThreshold) {
+				fresult.getAccepted().add(rect);
+			} else if (GeometryHelper.ratio(rect) < ratioThreshold) {
+				fresult.getAccepted().add(rect);
+			} else {
+				buffer.add(rect);
+			}
 		}
+
+		output = buffer;
 
 		List<Feature> features = new ArrayList<Feature>();
 
@@ -109,29 +124,18 @@ public class TextFilter implements Filter {
 					new File("workdir/textdetect/text_train.model")),
 					new FileDataSet(new File(fileName)));
 
-			int correct = 0;
-
+			int counter = 0;
 			for (Row row : classifyResult) {
-				if (1 == Integer.parseInt(String.valueOf(row.get(0))))
-					correct++;
+				if (0 == Integer.parseInt(String.valueOf(row.get(0))))
+					// Not a text
+					fresult.getAccepted().add(output.get(counter));
+				counter++;
 			}
-			if (correct == features.size()) {
-				// Fully match, text
-				return FilterResult.DISCARD;
-			}
-			if (correct > features.size() / 2) {
-				// Most of them are text
-				double entropy = FeatureHelper.entropy(new ImageAccessor(
-						cenv.sourceImage), range);
-				if (entropy > entropyThreshold)
-					return FilterResult.CONTINUE;
-				else
-					return FilterResult.DISCARD;
-			}
-			return FilterResult.CONTINUE;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		return fresult;
 	}
 
 	public File getTempDir() {

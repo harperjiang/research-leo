@@ -13,6 +13,10 @@ import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.Filter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.FilterResult;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.SizeFilter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.TextFilter;
 
 public class Split {
 
@@ -32,7 +36,6 @@ public class Split {
 		super();
 		filters = new ArrayList<Filter>();
 		filters.add(new SizeFilter());
-		// filters.add(new EntropyFilter());
 		filters.add(new TextFilter());
 	}
 
@@ -56,12 +59,13 @@ public class Split {
 		List<Rectangle> source = new ArrayList<Rectangle>();
 		List<Rectangle> result = new ArrayList<Rectangle>();
 		List<Rectangle> mature = new ArrayList<Rectangle>();
+		List<Rectangle> premature = new ArrayList<Rectangle>();
 		source.add(new Rectangle(0, 0, accessor.getWidth(), accessor
 				.getHeight()));
 
 		logger.debug("Start Split Loop:" + System.currentTimeMillis());
-		while (!source.isEmpty()) {
-			// for (int i = 0; i < 7; i++) {
+		 while (!source.isEmpty()) {
+//		for (int i = 0; i < 1; i++) {
 			for (Rectangle r : source) {
 				Rectangle fence = rect.lowerBound(r);
 				if (fence == null)
@@ -114,36 +118,24 @@ public class Split {
 						}
 					}
 				}
-
 				// All methods tried, this area is thought to be non-splittable
-				mature.add(fence);
+				premature.add(r);
 			}
 
-			source = new ArrayList<Rectangle>();
-			for (Rectangle r : result) {
-				int continueCount = 0;
-				boolean stop = false;
-				for (Filter f : filters) {
-					if (stop)
-						break;
-					switch (f.filter(r, cenv)) {
-					case CONTINUE:
-						continueCount++;
-						break;
-					case STOP:
-						mature.add(r);
-						stop = true;
-						break;
-					case DISCARD:
-					default:
-						stop = true;
-						break;
-					}
-				}
-				if (continueCount == filters.size())
-					source.add(r);
-			}
-			result = new ArrayList<Rectangle>();
+			source.clear();
+
+			// Move rectangles from result to source;
+			FilterResult filteredResult = filter(result);
+			// Move rectangles from premature to mature
+			FilterResult filteredMature = filter(premature);
+
+			source.addAll(filteredResult.getAccepted());
+			mature.addAll(filteredResult.getMatured());
+			mature.addAll(filteredMature.getAccepted());
+			mature.addAll(filteredMature.getMatured());
+
+			premature.clear();
+			result.clear();
 		}
 
 		logger.debug("Finishing Split Loop:" + System.currentTimeMillis());
@@ -153,6 +145,22 @@ public class Split {
 
 	public SplitEnv getCenv() {
 		return cenv;
+	}
+
+	private FilterResult filter(List<Rectangle> input) {
+		FilterResult result = new FilterResult();
+		result.getAccepted().addAll(input);
+		for (Filter filter : filters) {
+			List<Rectangle> output = new ArrayList<Rectangle>();
+			for (Rectangle r : result.getAccepted()) {
+				FilterResult fr = filter.filter(r, getCenv());
+				output.addAll(fr.getAccepted());
+				result.getMatured().addAll(fr.getMatured());
+			}
+			result.getAccepted().clear();
+			result.getAccepted().addAll(output);
+		}
+		return result;
 	}
 
 	private int[] searchBoxRange = { 15, 40 };
