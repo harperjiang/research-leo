@@ -8,14 +8,47 @@ import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 
 public class MaxSplitProcessor implements Processor {
 
-	private int widthThreshold = 500;
+	private static int widthThreshold = 200;
 
-	private int heightThreshold = 500;
+	private static int heightThreshold = 200;
 
-	private double splitThreshold = 0.1;
+	private static double splitThreshold = 0.1;
 
-	@Override
-	public List<Rectangle> process(Rectangle range, SplitEnv env) {
+	private static int borderThreshold = 6;
+
+	private Rectangle range;
+
+	private SplitEnv env;
+
+	private transient Rectangle maxSplit;
+
+	public MaxSplitProcessor(Rectangle range, SplitEnv env) {
+		super();
+		this.range = range;
+		this.env = env;
+	}
+
+	public Rectangle maxSplit() {
+		if (null == maxSplit) {
+			maxSplit = env.rectSplitter.maxSplit(range);
+		}
+		return maxSplit;
+	}
+
+	public Rectangle removeBorder() {
+		Rectangle maxSplit = maxSplit();
+		if (maxSplit == null) {
+			return range;
+		}
+		if (maxSplit.x - range.x <= borderThreshold
+				&& maxSplit.y - range.y <= borderThreshold
+				&& (range.x + range.width - maxSplit.x - maxSplit.width) <= borderThreshold
+				&& (range.y + range.height - maxSplit.y - maxSplit.height) <= borderThreshold)
+			return maxSplit;
+		return range;
+	}
+
+	public List<Rectangle> process() {
 		List<Rectangle> result = new ArrayList<Rectangle>();
 		if (range.getWidth() > widthThreshold
 				&& range.getHeight() > heightThreshold) {
@@ -50,4 +83,5 @@ public class MaxSplitProcessor implements Processor {
 			return null;
 		}
 	}
+
 }

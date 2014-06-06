@@ -64,8 +64,8 @@ public class Split {
 				.getHeight()));
 
 		logger.debug("Start Split Loop:" + System.currentTimeMillis());
-		 while (!source.isEmpty()) {
-//		for (int i = 0; i < 1; i++) {
+		while (!source.isEmpty()) {
+			// for (int i = 0; i < 2; i++) {
 			for (Rectangle r : source) {
 				Rectangle fence = rect.lowerBound(r);
 				if (fence == null)
@@ -86,15 +86,17 @@ public class Split {
 
 					continue;
 				}
+
+				MaxSplitProcessor msp = new MaxSplitProcessor(fence, cenv);
+
 				// Border Removal
-				Rectangle removed = rect.removeBorder(fence);
+				Rectangle removed = msp.removeBorder();
 				if (!removed.equals(fence)) {
 					result.add(removed);
 					continue;
 				}
 				// Rectangle Split, applied to big image
-				List<Rectangle> maxSplitResult = new MaxSplitProcessor()
-						.process(fence, cenv);
+				List<Rectangle> maxSplitResult = msp.process();
 				if (maxSplitResult != null) {
 					result.addAll(maxSplitResult);
 					continue;

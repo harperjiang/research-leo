@@ -114,15 +114,16 @@ public class MultiThreadSplit {
 					addResult(result, bottom);
 				return result;
 			}
+
+			MaxSplitProcessor msp = new MaxSplitProcessor(fence, cenv);
 			// Border Removal
-			Rectangle removed = cenv.rectSplitter.removeBorder(fence);
+			Rectangle removed = msp.removeBorder();
 			if (!removed.equals(fence)) {
 				addResult(result, removed);
 				return result;
 			}
 			// Rectangle Split, applied to big image
-			List<Rectangle> maxSplitResult = new MaxSplitProcessor().process(
-					fence, cenv);
+			List<Rectangle> maxSplitResult = msp.process();
 			if (maxSplitResult != null) {
 				for (Rectangle msr : maxSplitResult) {
 					addResult(result, msr);
@@ -171,6 +172,10 @@ public class MultiThreadSplit {
 			result.addAll(fresult.getAccepted());
 		}
 
+	}
+
+	public SplitEnv getCenv() {
+		return cenv;
 	}
 
 	private int[] searchBoxRange = { 15, 40 };

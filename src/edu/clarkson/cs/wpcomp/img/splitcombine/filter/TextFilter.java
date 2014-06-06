@@ -99,6 +99,10 @@ public class TextFilter implements Filter {
 
 		output = buffer;
 
+		if (CollectionUtils.isEmpty(output)) {
+			return fresult;
+		}
+
 		List<Feature> features = new ArrayList<Feature>();
 
 		for (Rectangle r : output) {
