@@ -1,3 +1,7 @@
+/*
+ * Notice: we specially design some data that contains only short characters, like "Store", "iPhone"
+ */
+
 package edu.clarkson.cs.wpcomp.task.textdetect;
 
 import java.awt.Color;
@@ -30,16 +34,35 @@ import edu.clarkson.cs.wpcomp.text.processor.Dicts;
 
 public class GenPositiveSetForText {
 
-	static final char[] SYMBOL = { ',', '.', '!', '\"', '\'', '?', '-' };
+	static final char[] SYMBOL = { ' ', ' ', ' ', ' ', ' ', ' ' };
 
 	static StringBuilder ALPHABET;
 
 	static {
 		ALPHABET = new StringBuilder();
 		for (int i = 0; i < 26; i++) {
-			ALPHABET.append((char) ('a' + i));
 			ALPHABET.append((char) ('A' + i));
 		}
+		ALPHABET.append('a');
+		ALPHABET.append('b');
+		ALPHABET.append('c');
+		ALPHABET.append('d');
+		ALPHABET.append('e');
+		ALPHABET.append('h');
+		ALPHABET.append('i');
+		ALPHABET.append('k');
+		ALPHABET.append('l');
+		ALPHABET.append('m');
+		ALPHABET.append('n');
+		ALPHABET.append('o');
+		ALPHABET.append('r');
+		ALPHABET.append('s');
+		ALPHABET.append('t');
+		ALPHABET.append('u');
+		ALPHABET.append('v');
+		ALPHABET.append('w');
+		ALPHABET.append('x');
+		ALPHABET.append('z');
 		for (int i = 0; i < 10; i++) {
 			ALPHABET.append((char) ('0' + i));
 		}
@@ -52,18 +75,16 @@ public class GenPositiveSetForText {
 			new Font("Courier", Font.PLAIN, 12) };
 
 	public static void main(String[] args) throws Exception {
-//		generateWord();
-		generateFromFile();
+		generateWord();
+//		generateFromFile();
 	}
 
 	public static void generateWord() throws Exception {
 		PrintWriter pw = new PrintWriter(new FileOutputStream(
-				"res/textsample/word"));
+				"workdir/textdetect/text_positive_short"));
 
 		Random random = new Random(System.currentTimeMillis());
-		int dictSize = Dicts.wordList.getDict().size();
-		List<String> words = new ArrayList<String>();
-		words.addAll(Dicts.wordList.getDict());
+
 		for (int repeat = 0; repeat < 10000; repeat++) {
 			BufferedImage image = new BufferedImage(1000, 50,
 					BufferedImage.TYPE_INT_RGB);
@@ -78,10 +99,10 @@ public class GenPositiveSetForText {
 			graphic.setFont(newfont);
 
 			StringBuilder sb = new StringBuilder();
-			int length = random.nextInt(10) + 1;
+			int length = 10 + random.nextInt(20);
 			for (int i = 0; i < length; i++) {
-				int index = random.nextInt(dictSize);
-				sb.append(words.get(index)).append(" ");
+				int index = random.nextInt(ALPHABET.length());
+				sb.append(ALPHABET.charAt(index));
 			}
 
 			graphic.drawString(sb.toString().trim(), 20, 30);

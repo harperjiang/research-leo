@@ -15,6 +15,8 @@ public class RectangleSplitter extends AbstractSplitter {
 		super(core);
 	}
 
+	private static double countThreshold = 0.7;
+
 	public Rectangle maxSplit(Rectangle range) {
 		if (null == range) {
 			range = new Rectangle(0, 0, getAccessor().getWidth(), getAccessor()
@@ -22,6 +24,8 @@ public class RectangleSplitter extends AbstractSplitter {
 		}
 		long area = 0;
 		Rectangle max = null;
+
+		int wall = -1;
 		for (int i = range.x; i < range.x + range.width; i++) {
 			for (int j = range.y; j < range.y + range.height; j++) {
 				Dimension topLeft = new Dimension(core.preprocess[i][j]);
@@ -33,6 +37,9 @@ public class RectangleSplitter extends AbstractSplitter {
 						+ range.height - j);
 				long possible = topLeft.width * topLeft.height;
 				for (int w = topLeft.width - 1; w >= 0; w--) {
+					Dimension topRight = core.preprocess[i + w][j];
+					int lastValue = -1;
+					int lastValueCount = 0;
 					for (int h = topLeft.height - 1; h >= 0; h--) {
 						if (w * h < area) {
 							// fast break
@@ -41,7 +48,15 @@ public class RectangleSplitter extends AbstractSplitter {
 							h = 0;
 							continue;
 						}
-						Dimension topRight = core.preprocess[i + w][j];
+						if (lastValueCount >= countThreshold * range.height
+								&& w > lastValue) {
+							// A vertical wall is thought to be found, decrease
+							// width to be behind the wall
+							wall = lastValue;
+							w = lastValue + 1;
+							h = 0;
+							continue;
+						}
 						Dimension bottomLeft = core.preprocess[i][j + h];
 						if (topRight.height >= topLeft.height
 								&& bottomLeft.width >= topLeft.width) {
@@ -56,10 +71,27 @@ public class RectangleSplitter extends AbstractSplitter {
 								w = 0;
 								h = 0;
 							}
+						} else {
+							if (bottomLeft.width == lastValue) {
+								lastValueCount++;
+							} else {
+								lastValue = bottomLeft.width;
+								lastValueCount = 1;
+							}
+
+							if (topRight.height < topLeft.height
+									&& topRight.height < h) {
+								h = topRight.height + 1;
+							}
+
 						}
 					}
 				}
 
+			}
+			if (wall != -1) {
+				i += wall;
+				wall = -1;
 			}
 		}
 		return max;
@@ -113,7 +145,6 @@ public class RectangleSplitter extends AbstractSplitter {
 						}
 					}
 				}
-
 			}
 		}
 		return max;
@@ -173,36 +204,4 @@ public class RectangleSplitter extends AbstractSplitter {
 		return lowerbound;
 	}
 
-	public Rectangle removeBorder(Rectangle range) {
-		// Detect the existance of border
-		// Here we define border to be a rectangle with most pixels on the
-		// border being colored
-		/*
-		 * Rectangle test = new Rectangle(range.x + 1, range.y + 1, range.width
-		 * - 2, range.height - 2);
-		 * 
-		 * int xcounter = 0; for (int i = test.x; i < test.x + test.width; i++)
-		 * { // If black point exceeds the threshold, determine not a // border
-		 * if (Color.BLACK.equals(accessor.getValue(i, test.y))) xcounter++; if
-		 * (Color.BLACK.equals(accessor.getValue(i, test.y + test.height - 1)))
-		 * xcounter++; } if (test.width * borderThreshold < xcounter) { return
-		 * range; } int ycounter = 0; for (int i = test.y; i < test.y +
-		 * test.height; i++) { if (Color.BLACK.equals(accessor.getValue(test.x,
-		 * i))) ycounter++; if (Color.BLACK.equals(accessor .getValue(test.x +
-		 * test.width - 1, i))) ycounter++; } if (test.height * borderThreshold
-		 * < ycounter) { return range; }
-		 */
-		Rectangle maxSplit = maxSplit(range);
-		if (maxSplit == null) {
-			return range;
-		}
-		if (maxSplit.x - range.x <= borderThreshold
-				&& maxSplit.y - range.y <= borderThreshold
-				&& (range.x + range.width - maxSplit.x - maxSplit.width) <= borderThreshold
-				&& (range.y + range.height - maxSplit.y - maxSplit.height) <= borderThreshold)
-			return maxSplit;
-		return range;
-	}
-
-	private int borderThreshold = 6;
 }

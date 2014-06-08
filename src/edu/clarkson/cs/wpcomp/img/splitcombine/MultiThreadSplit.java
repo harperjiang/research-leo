@@ -15,6 +15,10 @@ import edu.clarkson.cs.wpcomp.img.GeometryHelper;
 import edu.clarkson.cs.wpcomp.img.GradientHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ColorAccessor;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.Filter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.FilterResult;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.SizeFilter;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.TextFilter;
 
 public class MultiThreadSplit {
 
@@ -110,15 +114,16 @@ public class MultiThreadSplit {
 					addResult(result, bottom);
 				return result;
 			}
+
+			MaxSplitProcessor msp = new MaxSplitProcessor(fence, cenv);
 			// Border Removal
-			Rectangle removed = cenv.rectSplitter.removeBorder(fence);
+			Rectangle removed = msp.removeBorder();
 			if (!removed.equals(fence)) {
 				addResult(result, removed);
 				return result;
 			}
 			// Rectangle Split, applied to big image
-			List<Rectangle> maxSplitResult = new MaxSplitProcessor().process(
-					fence, cenv);
+			List<Rectangle> maxSplitResult = msp.process();
 			if (maxSplitResult != null) {
 				for (Rectangle msr : maxSplitResult) {
 					addResult(result, msr);
@@ -150,22 +155,27 @@ public class MultiThreadSplit {
 			return result;
 		}
 
-		protected void addResult(List<Rectangle> result, Rectangle r) {
-			for (Filter f : filters) {
-				switch (f.filter(r, cenv)) {
-				case CONTINUE:
-					result.add(r);
-					break;
-				case STOP:
-					mature.add(r);
-					break;
-				case DISCARD:
-				default:
-					break;
+		protected void addResult(List<Rectangle> result, Rectangle range) {
+			FilterResult fresult = new FilterResult();
+			fresult.getAccepted().add(range);
+			for (Filter filter : filters) {
+				List<Rectangle> output = new ArrayList<Rectangle>();
+				for (Rectangle r : fresult.getAccepted()) {
+					FilterResult fr = filter.filter(r, cenv);
+					output.addAll(fr.getAccepted());
+					fresult.getMatured().addAll(fr.getMatured());
 				}
+				fresult.getAccepted().clear();
+				fresult.getAccepted().addAll(output);
 			}
+			mature.addAll(fresult.getMatured());
+			result.addAll(fresult.getAccepted());
 		}
 
+	}
+
+	public SplitEnv getCenv() {
+		return cenv;
 	}
 
 	private int[] searchBoxRange = { 15, 40 };

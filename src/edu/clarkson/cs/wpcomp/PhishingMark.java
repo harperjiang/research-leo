@@ -10,23 +10,25 @@ import javax.imageio.ImageIO;
 import edu.clarkson.cs.wpcomp.img.MarkHelper;
 import edu.clarkson.cs.wpcomp.img.accessor.ImageAccessor;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Combine;
-import edu.clarkson.cs.wpcomp.img.splitcombine.Filters;
-import edu.clarkson.cs.wpcomp.img.splitcombine.SizeFilter;
 import edu.clarkson.cs.wpcomp.img.splitcombine.Split;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.Filters;
+import edu.clarkson.cs.wpcomp.img.splitcombine.filter.SizeFilter;
 
 public class PhishingMark {
 
 	public static void main(String[] args) throws Exception {
-		File workdir = new File("workdir/03");
+		File workdir = new File("workdir/24");
 		BufferedImage input = ImageIO.read(new File(workdir.getAbsolutePath()
 				+ File.separator + "screenshot.png"));
 
 		Split split = new Split();
 		Combine combine = new Combine();
 
+		long start = System.currentTimeMillis();
 		List<Rectangle> ranges = split.split(input);
 		ranges = combine.combine(ranges);
 		ranges = Filters.filter(split.getCenv(), new SizeFilter(), ranges);
+		System.out.println(System.currentTimeMillis() - start);
 
 		ImageAccessor accessor = new ImageAccessor(input);
 		for (Rectangle com : ranges) {

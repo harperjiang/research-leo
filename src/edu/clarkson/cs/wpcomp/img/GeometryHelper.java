@@ -52,4 +52,20 @@ public class GeometryHelper {
 				rects[rects.length - 1]);
 		return cover(newarray);
 	}
+
+	public static int overlap(Rectangle r1, Rectangle r2, boolean vertical) {
+		int result = 0;
+		if (vertical) {
+			result = Math.min(r1.y + r1.height, r2.y + r2.height)
+					- Math.max(r1.y, r2.y);
+		} else {
+			result = Math.min(r1.x + r1.width, r2.x + r2.width)
+					- Math.max(r1.x, r2.x);
+		}
+		return result >= 0 ? result : 0;
+	}
+
+	public static double ratio(Rectangle r) {
+		return r.getWidth() / r.getHeight();
+	}
 }

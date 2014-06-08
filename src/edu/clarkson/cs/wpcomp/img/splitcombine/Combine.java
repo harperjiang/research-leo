@@ -15,6 +15,8 @@ public class Combine {
 
 	private double difference = 0.1;
 
+	private int distance = 5;
+
 	private Map<Rectangle, Integer> number;
 
 	private Map<Integer, List<Rectangle>> region;
@@ -45,6 +47,16 @@ public class Combine {
 					if (GeometryHelper.area(cover) <= (1 + difference)
 							* (GeometryHelper.area(first) + GeometryHelper
 									.area(second))) {
+						merge(first, second);
+					} else if (GeometryHelper.overlap(first, second, true) > Math
+							.min(first.height, second.height) * 0.7
+							&& cover.width <= first.width + second.width
+									+ distance) {
+						merge(first, second);
+					} else if (GeometryHelper.overlap(first, second, false) > Math
+							.min(first.width, second.width) * 0.7
+							&& cover.height <= first.height + second.height
+									+ distance) {
 						merge(first, second);
 					}
 				}
