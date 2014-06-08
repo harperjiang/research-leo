@@ -9,15 +9,15 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import edu.clarkson.cs.wpcomp.img.CropHelper;
+import edu.clarkson.cs.wpcomp.img.ImageHelper;
 
-public class CropHelperTest {
+public class ImageHelperTest {
 
 	@Test
 	public void testCrop() throws IOException {
 		BufferedImage image = ImageIO.read(new File(
 				"res/image/split/bbc_screen.png"));
-		BufferedImage croped = CropHelper.crop(image, new Rectangle(800, 20,
+		BufferedImage croped = ImageHelper.crop(image, new Rectangle(800, 20,
 				40, 50));
 		ImageIO.write(croped, "png", new File("res/image/split/bbc_croped.png"));
 	}
