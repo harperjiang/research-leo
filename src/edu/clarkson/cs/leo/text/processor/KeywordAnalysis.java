@@ -14,7 +14,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import edu.clarkson.cs.leo.common.sort.HeapSorter;
+import edu.clarkson.cs.clientlib.lang.sort.HeapSorter;
 import edu.clarkson.cs.leo.text.model.Token;
 import edu.clarkson.cs.leo.text.model.WordGroup;
 

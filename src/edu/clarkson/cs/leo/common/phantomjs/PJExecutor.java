@@ -7,21 +7,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import edu.clarkson.cs.leo.common.proc.OutputHandler;
-import edu.clarkson.cs.leo.common.proc.ProcessRunner;
+import edu.clarkson.cs.clientlib.lang.proc.OutputHandler;
+import edu.clarkson.cs.clientlib.lang.proc.ProcessRunner;
 
 public class PJExecutor {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
-
 	private File currentDir;
 
 	public File getCurrentDir() {
